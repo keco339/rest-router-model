@@ -18,10 +18,8 @@ function createParse(resourceConfig, resource, data, params) {
         retData.uuid = utils.createUUID();
     }
     // 设置默认值
-    restParamKeys.forEach(key => {
-        if (key == 'id') {
-            return true;
-        }
+    _.without(restParamKeys,...hrefKeys).forEach(key => {
+        if (key == 'id') { return true; }
         let {type = 'string', value = null} = restParams[key];
         retData[key] = value || (_.toLower(type) == 'number' ? 0 : (_.toLower(type) == 'json' ? {} : null));
     });
@@ -62,6 +60,7 @@ module.exports = function parse(options) {
             let retData={};
             if(method=='create'){
                 retData = createParse(resourceConfig, resource, body, params);
+                console.log(`[Parse Data] --> resource:${resource},method:${method} parse date:\n${JSON.stringify(retData,null,2)}`);
             }
             else if(method=='update'){
                 // 提取字段
@@ -74,6 +73,7 @@ module.exports = function parse(options) {
                 retData = _.assign(retData, body);
                 // 复制转换Href
                 hrefKeys.forEach(key=>{
+                    if(!body[`${key}Href`]) return;
                     let isPickUUID = _.has(restParams[key],'isPickUUID')?restParams[key].isPickUUID:true;
                     if(isPickUUID){
                         retData[`${key}UUID`] = utils.getLastResourceUUIDInURL(body[`${key}Href`]);
@@ -90,6 +90,8 @@ module.exports = function parse(options) {
                     }
                 }
                 retData.modifiedAt = moment().format('YYYY-MM-DD HH:mm:ss');
+
+                console.log(`[Parse Data] --> resource:${resource},method:${method} parse date:\n${JSON.stringify(retData,null,2)}`);
             }
             else if(method=='get'){
                 retData.uuid = params.uuid;
@@ -121,7 +123,6 @@ module.exports = function parse(options) {
                         }
                     })
                 }
-
             }
             else if(method=='listAll'){
                 retData = _.assign({},query);
@@ -141,7 +142,7 @@ module.exports = function parse(options) {
             else {
                 retData={params,query,body}
             }
-            console.log(`[Parse Data] --> resource:${resource},method:${method} parse date:\n${JSON.stringify(retData,null,2)}`);
+
             done(null,retData);
         });
     });

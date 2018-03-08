@@ -296,19 +296,25 @@ module.exports = function modelBase(bookshelf, params) {
             let modelInstance = this.forge();
             let relateCollection = modelInstance.related(inflection.pluralize(relate));
             let relateModel = relateCollection.relatedData.target.forge({uuid:relateModelUUID});
+            let that = this;
 
             let paginate =  relateModel.related(modelInstance.tableName.toLowerCase()).withPivot(['uuid']).query(function (qb) {
                 let {offset=0,limit=10,orderBy=`${modelInstance.hasTimestamps[0]} desc`} = (filter||{});
                 let orderBys = orderBy.split(',').map(str=>str.split(' '));
-                qb.where(extend({}, _.omit(filter,['offset','limit','orderBy'])));
+
+                // qb.where(extend({}, _.omit(filter,['offset','limit','orderBy'])));
+                that.queryString2SQL(qb,_.omit(filter,['offset','limit','orderBy']));
                 orderBys.forEach(([sort,order])=> qb.orderBy(sort,order));
             }).fetch().then(users=>users.toJSON());
+            // let paginate = [];
 
             let obj = relateModel.related(modelInstance.tableName.toLowerCase());
             let count = obj.query(function (qb) {
-                qb.where(extend({}, _.omit(filter,['offset','limit','orderBy'])));
-                obj.relatedData.joinClauses(qb);
+                // qb.where(extend({}, _.omit(filter,['offset','limit','orderBy'])));
+                that.queryString2SQL(qb,_.omit(filter,['offset','limit','orderBy']));
+                obj.relatedData.selectConstraints(qb,{});
             }).count();
+            // let count = 100;
 
             return Promise.all([paginate,count]).then(([items,count])=>({size:count,items}))
         },

@@ -34,7 +34,7 @@ class BaseBusiness{
     delete(uuid){
         let that = this;
         return this.model.delete(_.isObject(uuid)?uuid.uuid:uuid).catch(e=>{
-            let errMsg = { code:1599,description: `resource: ${that.name}, uuid: ${data.uuid}`};
+            let errMsg = { code:1599,description: `resource: ${that.name}, uuid: ${uuid}`};
             throw boom.notFound(errorCodeTable.code2Text(errMsg.code),errMsg);
         });
     }

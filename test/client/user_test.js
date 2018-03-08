@@ -11,12 +11,12 @@ const utils = require('../../common/utils');
 
 
 
-describe('User Test Case:',()=>{
+describe('User Test Case:',function () {
     let directoryUUID  = 'qKvqUmVrUUujqpIQ0KjTeA';
     let userUUID = 'OK2TMCUK5LuOCncvvYyu1A';
-    describe('user test case:',  ()=>{
+    describe('user test case:',  function (){
         let userUUID = 'OK2TMCUK5LuOCncvvYyu1A'; //null;
-        it('create a user test case:',  ()=> {
+        it('create a user test case:',  function (){
             //this.timeout(0);
             let  options = {
                 body: {
@@ -38,7 +38,7 @@ describe('User Test Case:',()=>{
 
 
         });
-        it('get a user test case:',  ()=> {
+        it('get a user test case:',  function (){
             //this.timeout(0);
 
             let  options = {
@@ -51,7 +51,7 @@ describe('User Test Case:',()=>{
                     console.log('body:',JSON.stringify(body,null,2));
                 })
         });
-        it('update a user test case:',  ()=> {
+        it('update a user test case:',  function (){
             //this.timeout(0);
 
             let  options = {
@@ -66,7 +66,7 @@ describe('User Test Case:',()=>{
                 })
         });
 
-        it('list users test case:',  ()=> {
+        it('list users test case:',  function (){
             //this.timeout(0);
 
             let  options = {
@@ -80,7 +80,7 @@ describe('User Test Case:',()=>{
                     console.log('body:',JSON.stringify(body,null,2));
                 })
         });
-        it('delete a user test case:',  ()=> {
+        it('delete a user test case:',  function (){
             //this.timeout(0);
 
             let  options = {
@@ -94,28 +94,28 @@ describe('User Test Case:',()=>{
                 })
         });
     });
-    describe('batch user test case:',  ()=>{
+    describe('batch user test case:',  function (){
         let userUUID = null;
-        it('batch create users test case:',  ()=> {
-            //this.timeout(0);
-            let  options = {
-                body: [
-                    { name: 'yiyp1', mobile: '13000000001'},
-                    { name: 'keco2', mobile: '13000000002'},
-                ],
-                json: true, simple: true, resolveWithFullResponse: true
-            };
-
-            return request.post(`${url}/users/batchCreate`,options)
-                .then(function ({statusCode,body,headers,request}) {
-                    expect(statusCode).to.equal(201);
-                    console.log('statusCode:',statusCode);
-                    console.log('body:',JSON.stringify(body,null,2));
-                    userUUID = body.uuid;
-                })
-
-
-        });
+        // it('batch create users test case:',  ()=> {
+        //     //this.timeout(0);
+        //     let  options = {
+        //         body: [
+        //             { name: 'yiyp1', mobile: '13000000001'},
+        //             { name: 'keco2', mobile: '13000000002'},
+        //         ],
+        //         json: true, simple: true, resolveWithFullResponse: true
+        //     };
+        //
+        //     return request.post(`${url}/users/batchCreate`,options)
+        //         .then(function ({statusCode,body,headers,request}) {
+        //             expect(statusCode).to.equal(201);
+        //             console.log('statusCode:',statusCode);
+        //             console.log('body:',JSON.stringify(body,null,2));
+        //             userUUID = body.uuid;
+        //         })
+        //
+        //
+        // });
     //     it('batch get users test case:',  ()=> {
     //         //this.timeout(0);
     //

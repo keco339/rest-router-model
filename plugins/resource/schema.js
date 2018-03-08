@@ -94,23 +94,25 @@ module.exports = function schema(options) {
             let schema = {};
             if(_.indexOf(SingleSchemaMethods, method) > -1){
                 schema = generateResourceSchema(name,data);
-                console.log(`[Seneca Schema]--> ${JSON.stringify(schema,null,2)}`);
+                if(method!='get'){
+                    console.log(`[REST Schema]--> \n${JSON.stringify(schema,null,2)}`);
+                }
+
             }
             else if(_.indexOf(ListSchemaMethods, method) > -1){
                 let {offset=0,size=0,items={}} = data;
                 let dataArray = _.isArray(items) ? items : [items];
                 schema = {
-                    href: _addHttpPrefix(cxt.request.url),
+                    href: _addHttpPrefix(cxt.request.originalUrl),
                     offset ,limit:dataArray.length,size,
                     items: dataArray.map(data=>generateResourceSchema(name,data)),
                 };
-                console.log(`[Seneca Schema]--> list offset:${schema.offset}, limit:${schema.limit}, size:${schema.size}, items.length:${items.length}`);
+                console.log(`[REST Schema]--> list offset:${schema.offset}, limit:${schema.limit}, size:${schema.size}, items.length:${items.length}`);
             }
             else if(_.indexOf(ArraySchemaMethods, method) > -1){
                 let dataArray = _.isArray(data) ? data : [data];
                 schema = dataArray.map(data=>generateResourceSchema(name,data));
-                console.log(`[Seneca Schema]--> array length:${schema.length}`);
-
+                console.log(`[REST Schema]--> array length:${schema.length}`);
             }
             else {
                 schema = data;

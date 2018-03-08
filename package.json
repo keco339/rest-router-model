@@ -14,6 +14,7 @@
     "http",
     "middleware"
   ],
+  "author": "keco339",
   "license": "MIT",
   "dependencies": {
     "bookshelf": "^0.12.1",
@@ -28,10 +29,10 @@
     "lodash": "^4.17.4",
     "moment": "^2.20.1",
     "mysql": "^2.15.0",
-    "node-uuid": "^1.4.8",
     "seneca": "^3.4.3",
     "seneca-promise": "^1.1.1",
-    "seneca-web": "^2.2.0"
+    "seneca-web": "^2.2.0",
+    "uuid": "^3.2.1"
   },
   "devDependencies": {
     "chai": "^4.1.2",
