@@ -23,16 +23,17 @@ const OrNotReg = /^ORNOT\(((\w|-| |:|@)*)\)$/;
 const OrInReg = /^ORIN\(((\w|-| |:|@|,|\[|\])*)\)$/;
 const OrNotInReg = /^ORNOTIN\(((\w|-| |:|@|,|\[|\])*)\)$/;
 
-function queryString2SQL(queryBuilder, qs) {
+function queryString2SQL(queryBuilder, qs, table = null) {
     _.forEach(qs,(value, key) =>{
+        let TableKey = table ? `${table}.${key}` : key;
         if(_.isEmpty(value)){
-            queryBuilder.whereNull(key);
+            queryBuilder.whereNull(TableKey);
         }
         else if(_.isString(value)){
             // 模糊查询
             if ( value.indexOf('*') != -1) {
                 let v = value.replace(/\*/g, '%');
-                queryBuilder.where(key, 'like', v);
+                queryBuilder.where(TableKey, 'like', v);
             }
             // 区间查询
             else if(RangeReg.test(value)){
@@ -40,7 +41,7 @@ function queryString2SQL(queryBuilder, qs) {
                 _.zip(range, [/^\[/ , /\]$/], ['>' , '<']).forEach(([v,r,s])=>{
                     if(!_.isEmpty(v)){
                         let symbol = s + (r.test(value)?'=':'');
-                        queryBuilder.where(key, symbol, v);
+                        queryBuilder.where(TableKey, symbol, v);
                     }
                 });
             }
@@ -48,77 +49,77 @@ function queryString2SQL(queryBuilder, qs) {
             else if(OrReg.test(value)){
                 let v = OrReg.exec(value)[1];
                 if(_.isEmpty(v) || v.toLowerCase()=='null'){
-                    queryBuilder.orWhereNull(key)
+                    queryBuilder.orWhereNull(TableKey)
                 }
                 else {
-                    queryBuilder.orWhere(key, '=', v);
+                    queryBuilder.orWhere(TableKey, '=', v);
                 }
             }
             // OR IN 查询
             else if(OrInReg.test(value)){
                 let v = OrInReg.exec(value)[1];
                 if(_.isEmpty(v)|| v.toLowerCase()=='null'){
-                    queryBuilder.orWhereNull(key);
+                    queryBuilder.orWhereNull(TableKey);
                 }
                 else {
                     let array = v.replace(/(\[)|(\])|(\")/g,"").split(',').map(str=>_.trim(str));
-                    queryBuilder.orWhereIn(key,array);
+                    queryBuilder.orWhereIn(TableKey, array);
                 }
             }
             // NOT 非查询
             else if(NotReg.test(value)){
                 let v = NotReg.exec(value)[1];
                 if(_.isEmpty(v)|| v.toLowerCase()=='null'){
-                    queryBuilder.whereNotNull(key);
+                    queryBuilder.whereNotNull(TableKey);
                 }
                 else {
-                    queryBuilder.whereNot(key,'=',v);
+                    queryBuilder.whereNot(TableKey, '=', v);
                 }
             }
             // NOT IN 查询
             else if(NotInReg.test(value)){
                 let v = NotInReg.exec(value)[1];
                 if(_.isEmpty(v)|| v.toLowerCase()=='null'){
-                    queryBuilder.whereNotNull(key);
+                    queryBuilder.whereNotNull(TableKey);
                 }
                 else {
                     let array = v.replace(/(\[)|(\])|(\")/g,"").split(',').map(str=>_.trim(str));
-                    queryBuilder.whereNotIn(key,array);
+                    queryBuilder.whereNotIn(TableKey, array);
                 }
             }
             // Or Not 查询
             else if(OrNotReg.test(value)){
                 let v = OrNotReg.exec(value)[1];
                 if(_.isEmpty(v)|| v.toLowerCase()=='null'){
-                    queryBuilder.orWhereNotNull(key);
+                    queryBuilder.orWhereNotNull(TableKey);
                 }
                 else {
-                    queryBuilder.orWhereNot(key,'=',v);
+                    queryBuilder.orWhereNot(TableKey, '=', v);
                 }
             }
             // OR NOT IN 查询
             else if(OrNotInReg.test(value)){
                 let v = OrNotInReg.exec(value)[1];
                 if(_.isEmpty(v)|| v.toLowerCase()=='null'){
-                    queryBuilder.orWhereNotNull(key);
+                    queryBuilder.orWhereNotNull(TableKey);
                 }
                 else {
                     let array = v.replace(/(\[)|(\])|(\")/g,"").split(',').map(str=>_.trim(str));
-                    queryBuilder.orWhereNotIn(key,array);
+                    queryBuilder.orWhereNotIn(TableKey, array);
                 }
             }
             else{
-                queryBuilder.where(key, '=', value);
+                queryBuilder.where(TableKey, '=', value);
             }
         }
         else if(_.isArray(value) && value.length>0){
-            queryBuilder.whereIn(key,value);
+            queryBuilder.whereIn(TableKey, value);
         }
         else if(_.isEmpty(value)){
-            queryBuilder.whereNull(key);
+            queryBuilder.whereNull(TableKey);
         }
         else {
-            queryBuilder.where(key, '=', value);
+            queryBuilder.where(TableKey, '=', value);
         }
     });
 }
@@ -317,6 +318,37 @@ module.exports = function modelBase(bookshelf, params) {
             // let count = 100;
 
             return Promise.all([paginate,count]).then(([items,count])=>({size:count,items}))
+        },
+        listByUpSpuers: function (upSupers, filter) {
+            console.log(JSON.stringify(upSupers, null, 2));
+            let modelInstance = this.forge();
+
+            filter = extend({}, filter);
+            let {offset = 0, limit = 10, orderBy = `${modelInstance.hasTimestamps[0]} desc`} = filter;
+            let orderBys = orderBy.split(',').map(str => str.split(' '));
+
+            let that = this;
+            let objTemp = this.query(function (qb) {
+                upSupers.reduce((model, {name, uuid, linkName}) => {
+                    let superModel = model.related(linkName);
+                    let relatedData = superModel.relatedData;
+                    let curTable = relatedData.parentTableName;
+                    let curForeignKey = relatedData.foreignKey;
+                    let joinTable = relatedData.targetTableName;
+                    let targetKey = relatedData.targetIdAttribute;
+                    qb.join(joinTable, joinTable + '.' + targetKey, '=', curTable + '.' + curForeignKey);
+                    if (uuid) {
+                        qb.where(joinTable + '.' + `${name}UUID`, uuid);
+                    }
+                    // console.log(name,uuid,linkName);
+                    return superModel;
+                }, modelInstance);
+                that.queryString2SQL(qb, _.omit(filter, ['offset', 'limit', 'orderBy']), modelInstance.tableName);
+            });
+            objTemp = orderBys.reduce((obj, [sort, order]) => obj.orderBy(sort, order), objTemp);
+            return objTemp.fetchPage({offset, limit}).then(rows => {
+                return {size: _.get(rows, "pagination.rowCount") || 0, items: rows.toJSON()};
+            });
         },
         // 删除
         'delete': function (id) {

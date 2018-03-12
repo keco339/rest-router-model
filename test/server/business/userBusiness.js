@@ -13,7 +13,7 @@ class UserBusiness extends BaseBusiness{
         return {name:this.name,method:'sexSta',abc:this.abc}
     }
     fun(){
-        return {name:this.name,method:'abc',abc:this.abc}
+        return {name: this.name, method: 'fun', abc: this.abc}
     }
 
     st(data){

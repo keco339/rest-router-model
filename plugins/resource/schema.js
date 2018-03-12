@@ -49,12 +49,16 @@ function generateResourceSchemaFn(resourceConfig,makeResourceHref, name, data) {
             let superResourceUUID = data[`${superResourceName}UUID`];
             schema[superResourceName] = {href:superResourceUUID? makeResourceHref(superResourceName,superResourceUUID):null};
         }
-        // 生成下级资源链接
+        // 生成所有下级资源列表链接（包括下下级）
         let lowerResourceNames =  _.keys(resourceConfig).filter( n=> resourceConfig[n].super==name );
-        lowerResourceNames.forEach(lowerName=>{
-            let pluralizeLowerName = inflection.pluralize(lowerName);
-            schema[pluralizeLowerName] = {href: `${makeResourceHref(name,data.uuid)}/${pluralizeLowerName}`};
-        });
+        while (!_.isEmpty(lowerResourceNames)) {
+            lowerResourceNames = _.flatMap(lowerResourceNames, lowerName => {
+                let pluralizeLowerName = inflection.pluralize(lowerName);
+                schema[pluralizeLowerName] = {href: `${makeResourceHref(name, data.uuid)}/${pluralizeLowerName}`};
+                return _.keys(resourceConfig).filter(n => resourceConfig[n].super == lowerName);
+            });
+        }
+
         // 生成关系资源链接
         if(resourceConfig[name].type!='membership'){
             (resourceConfig[name].memberships || []).map(mName=>{

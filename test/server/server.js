@@ -28,14 +28,16 @@ const app = new Koa();
 
 let options = {serverName: server_name, ip: ip, port: port};
 
-let koa_router = restRouterModel.koaRestRouter(resourceConfig, extendBusinesses, config.knex, options);
+// let koa_router = restRouterModel.koaRestRouter(resourceConfig, extendBusinesses, config.knex, options);
 
-app.use(logger());
-app.use(koa_router.routes());
+restRouterModel.koaRestRouter(resourceConfig, extendBusinesses, config.knex, options).then(koa_router => {
+    app.use(logger());
+    app.use(koa_router.routes());
 
-let server = app.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
+    let server = app.listen(port);
+    server.on('error', onError);
+    server.on('listening', onListening);
+});
 
 // Event listener for HTTP server "error" event.
 function onError(error) {
@@ -57,12 +59,10 @@ function onError(error) {
 }
 //Event listener for HTTP server "listening" event.
 function onListening() {
-    let addr = server.address();
+    let addr = this.address();
     let bind = typeof addr === 'string' ? (`pipe ${addr}`) : (`port ${addr.port}`);
 
-    setTimeout(function () {
-        console.log(`[Server Start] --> ${server_name} listening on ${bind}`);
-    },1000);
+    console.log(`[Server Start] --> ${server_name} listening on ${bind}`);
 }
 
 

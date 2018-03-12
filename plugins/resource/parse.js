@@ -108,6 +108,25 @@ module.exports = function parse(options) {
                     if(_.has(params,uuidName)){
                         retData[uuidName] = params[uuidName] || 'Temp_UUID';
                     }
+                    // 挂接更上级资源
+                    let isHook = false;
+                    let upSupers = [];
+                    let upSuperName = resourceConfig[superName].super;
+                    while (upSuperName) {
+                        let upSuperUUIDName = `${upSuperName}UUID`;
+                        let uuid = null;
+                        if (_.has(params, upSuperUUIDName)) {
+                            isHook = true;
+                            uuid = params[upSuperUUIDName] || 'Temp_UUID';
+                        }
+                        let item = {name: upSuperName, uuid: uuid, linkName: superName};
+                        upSupers.push(item);
+                        superName = upSuperName;
+                        upSuperName = resourceConfig[upSuperName].super
+                    }
+                    if (isHook) {
+                        retData.$upSupers = upSupers;
+                    }
                 }
                 // 关系资源
                 if(resourceConfig[resource].memberships){
@@ -123,6 +142,7 @@ module.exports = function parse(options) {
                         }
                     })
                 }
+                console.log(`[Parse Data] --> resource:${resource},method:${method} parse date:\n${JSON.stringify(retData, null, 2)}`);
             }
             else if(method=='listAll'){
                 retData = _.assign({},query);

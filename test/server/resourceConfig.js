@@ -3,12 +3,12 @@
  */
 module.exports = {
     'user': {
-        rest_api: 'batch',//'base',//'batch',
+        rest_api: 'base',//'base',//'batch',
         super: 'directory',
         extend_api: [
             {name:'sexSta', method:'GET', statusCode:200},
             {name:'fun', method:'GET', statusCode:200},
-            {name:'st', method:'GET', statusCode:200},
+            {name: 'st', type: 'object', method: 'GET', statusCode: 200},
         ],
 
         params: {
@@ -39,6 +39,7 @@ module.exports = {
     },
     'group':{
         rest_api: 'base',
+        super: 'tenant',
         params:{
             name:{type:'string'},
             description:{type:'string'},

@@ -81,11 +81,14 @@ function isValidMethod (method) {
 function getHTTPMethod(obj) {
     return _.keys(obj).filter(key=>isValidMethod(key));
 }
+
+// 扩展接口描述 ==> URL map
 function extendApiMap(extend_api) {
     let extendMap={};
     (extend_api || []).map(extend=>{
-        // [{name:'test',method:'POST,GET'}]
+        // [{name:'test',type:'object',method:'POST,GET'}]
         extendMap[extend.name] = {name: '',suffix: `/${extend.name}`};
+        extendMap[extend.name].suffix = (extend.type && extend.type == 'object') ? `/:uuid/${extend.name}` : `/${extend.name}`;
         _.split(extend.method,',')
             .map(method=>_.trim(method).toUpperCase())
             .map(method=>{extendMap[extend.name][method]=true;});
@@ -93,7 +96,7 @@ function extendApiMap(extend_api) {
     return extendMap;
 }
 
-function getPrefix(resourceConfig, name){
+function getAllUriPrefixs(resourceConfig, name) {
     let prefixs = [];
 
     let pluralizeName = inflection.pluralize(name);
@@ -113,6 +116,13 @@ function getPrefix(resourceConfig, name){
 
 }
 
+function logUriMap(name, action, map, uri) {
+    let str1 = `{resource:${name} action:${action}}`;
+    let n = str1.length;
+    let padN = n <= 35 ? 35 : (n <= 45 ? 45 : (n <= 55 ? 55 : 60));
+    console.log(`[REST URI Map] --> ${_.padEnd(str1, padN, ' ')} URI: ${_.padEnd(getHTTPMethod(map[action]), 8, ' ')}  ${uri}`)
+}
+
 function generateRouteMaps(resourceConfig) {
     // 获取所有资源名
     let resourceNames = _.keys(resourceConfig);
@@ -124,16 +134,37 @@ function generateRouteMaps(resourceConfig) {
         let extendMap = extendApiMap(resourceConfig[name].extend_api);
         let map = _.assign({},extendMap,baseMap);
         // 生成获取资源URL前缀
-        let prefixs = getPrefix(resourceConfig, name);
+        let prefixs = getAllUriPrefixs(resourceConfig, name);
         return prefixs.map(prefix=>{
-            _.keys(map).forEach(action=>{
-                let route = {alias:map[action].alias,prefix:prefix,part:map[action].name,postfix:null, suffix:map[action].suffix};
-                let uri = buildPath(route);
-                console.log(`[REST URI Map] --> {resource:${name} action:${_.padEnd(action+'}',15,' ')} URI: ${_.padEnd(getHTTPMethod(map[action]),8,' ')}  ${uri}`)
-
-            });
+            {
+                // 打印URI路径信息
+                _.keys(map).forEach(action => {
+                    let route = {
+                        alias: map[action].alias,
+                        prefix: prefix,
+                        part: map[action].name,
+                        postfix: null,
+                        suffix: map[action].suffix
+                    };
+                    let uri = buildPath(route);
+                    logUriMap(name, action, map, uri);
+                });
+            }
             return {pin: jsonic.stringify({resource: name, type:'api',action: '*'}), prefix, map };
         });
+    });
+    // 生成在上上级资源下 列表下属资源
+    let hasUpSuperResourceNames = resourceNames.filter(name => (resourceConfig[name].super && resourceConfig[resourceConfig[name].super].super));
+    let upSuperMaps = hasUpSuperResourceNames.map(name => {
+        let pName = inflection.pluralize(name);
+        let upSuperName = resourceConfig[resourceConfig[name].super].super;
+        let pUpSuperName = inflection.pluralize(upSuperName);
+        let uri = `/api/:version/${pUpSuperName}/:${upSuperName}UUID/${pName}`;
+        let map = {list: {GET: true, name: ''}};
+        let action = 'list';
+        // console.log(`[REST URI Map] --> {${_.padEnd(`resource:${name} action:${action}}`,35,' ')} URI: ${_.padEnd(getHTTPMethod(map[action]),8,' ')}  ${uri}`);
+        logUriMap(name, action, map, uri);
+        return {pin: jsonic.stringify({resource: name, type: 'api', action: '*'}), prefix: uri, map};
 
     });
     // 生成关系型资源 路由映射规则
@@ -149,15 +180,20 @@ function generateRouteMaps(resourceConfig) {
                 let uri = `/api/:version/${rPName}/:${rName}UUID/${pName}`;
                 let map = { list: {GET: true, name: ''}};
                 let action = 'list';
-                console.log(`[REST URI Map] --> {resource:${name} action:${_.padEnd(action+'}',15,' ')} URI: ${_.padEnd(getHTTPMethod(map[action]),8,' ')}  ${uri}`);
+                // console.log(`[REST URI Map] --> {${_.padEnd(`resource:${name} action:${action}}`,35,' ')} URI: ${_.padEnd(getHTTPMethod(map[action]),8,' ')}  ${uri}`);
 
+                logUriMap(name, action, map, uri);
                 return {pin: jsonic.stringify({resource: name, type:'api',action: '*'}), prefix: uri, map };
             });
         });
     });
-    return [...routeMaps,...membershipRouteMaps];
+    return [...routeMaps, ...membershipRouteMaps, ...upSuperMaps];
 }
 
 module.exports = {
     generateRouteMaps
 };
+
+// const resourceConfig = require('../../test/server/resourceConfig');
+// let map = generateRouteMaps(resourceConfig);
+// console.log(JSON.stringify(map,null,2));
