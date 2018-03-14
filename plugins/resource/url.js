@@ -187,6 +187,23 @@ function generateRouteMaps(resourceConfig) {
             });
         });
     });
+
+    // 为关系容器增加add,remove
+    let membershipContainerNames = resourceNames.filter(name => (resourceConfig[name].type || '').toLowerCase() == 'membershipContainer');
+    let membershipContainerRouteMaps = membershipContainerNames.map(name => {
+        let pName = inflection.pluralize(name);
+        let uri = `/api/:version/${pUpSuperName}/:${upSuperName}UUID/${pName}`;
+        let map = {
+            list: {GET: true, name: ''}
+        };
+        let action = 'list';
+        logUriMap(name, action, map, uri);
+
+
+        return {pin: jsonic.stringify({resource: name, type: 'api', action: '*'}), prefix: uri, map};
+    });
+
+
     return [...routeMaps, ...membershipRouteMaps, ...upSuperMaps];
 }
 

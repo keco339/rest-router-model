@@ -28,6 +28,19 @@ module.exports = function restRouter(resourceConfig, extendBusinesses, dbConfig,
         seneca.use(SenecaPromise);
         console.log(`[Seneca Start] --> id: ${seneca.id}, start_time : ${seneca.start_time} , tag : ${seneca.tag} , version : ${seneca.version}`);
 
+        _.keys(resourceConfig).forEach(name => {
+            if (resourceConfig[name].type == 'membershipContainer') {
+                let extend_api = resourceConfig[name].extend_api || [];
+                [['add', 201], ['remove', 204]]
+                    .filter(([method]) => _.findIndex(extend_api, obj => (obj.name == method)) == -1)
+                    .forEach(([method, statusCode]) => {
+                        extend_api.push({name: method, type: 'object', method: 'POST', statusCode: statusCode});
+                    });
+
+                resourceConfig[name].extend_api = extend_api;
+            }
+        });
+
         // 资源接口插件
         seneca.use('../../plugins/resource/resources', resourceConfig);
         // HTTP数据解析

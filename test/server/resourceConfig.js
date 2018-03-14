@@ -39,6 +39,7 @@ module.exports = {
     },
     'group':{
         rest_api: 'base',
+        type: 'membershipContainer',
         super: 'tenant',
         params:{
             name:{type:'string'},

@@ -74,7 +74,31 @@ describe('Group Test Case:',function () {
                     expect(statusCode).to.equal(200);
                 })
         });
-        it('delete a user test case:',  function (){
+        it('add user in group test case:', function () {
+            let options = {
+                body: {userHref: 'http://api/v1/users/group-test-user-uuid'},
+                json: true, simple: false, resolveWithFullResponse: true
+            };
+            return request.post(`${url}/groups/${groupUUID}/add`, options)
+                .then(function ({statusCode, body, headers, request}) {
+                    console.log('statusCode:', statusCode);
+                    console.log('body:', JSON.stringify(body, null, 2));
+                    expect(statusCode).to.equal(201);
+                })
+        });
+        it('remove user form group test case:', function () {
+            let options = {
+                body: {userHref: 'http://api/v1/users/group-test-user-uuid'},
+                json: true, simple: false, resolveWithFullResponse: true
+            };
+            return request.post(`${url}/groups/${groupUUID}/remove`, options)
+                .then(function ({statusCode, body, headers, request}) {
+                    console.log('statusCode:', statusCode);
+                    console.log('body:', JSON.stringify(body, null, 2));
+                    expect(statusCode).to.equal(204);
+                })
+        });
+        it('delete a group test case:', function () {
             //this.timeout(0);
             let  options = {
                 json: true, simple: false, resolveWithFullResponse: true
