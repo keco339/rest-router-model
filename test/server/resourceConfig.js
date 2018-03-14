@@ -2,6 +2,15 @@
  * Created by Administrator on 2018/1/15.
  */
 module.exports = {
+    'tenant': {
+        rest_api: 'base',
+        params: {
+            name: {type: 'string'},
+            description: {type: 'string'},
+            createdAt: {type: 'time'},
+            modifiedAt: {type: 'time'},
+        },
+    },
     'user': {
         rest_api: 'base',//'base',//'batch',
         super: 'directory',
@@ -19,9 +28,6 @@ module.exports = {
             createdAt: {type:'time'},
             modifiedAt:{type:'time'},
         },
-        links:{
-        }
-
     },
     'directory': {
         rest_api: 'base',
@@ -33,9 +39,6 @@ module.exports = {
             createdAt: {type:'time'},
             modifiedAt:{type:'time'},
         },
-        links:{
-
-        }
     },
     'group':{
         rest_api: 'base',
@@ -58,18 +61,6 @@ module.exports = {
             group:{type:'url'},
             createdAt: {type:'time'},
             modifiedAt:{type:'time'},
-        }
-    },
-    'tenant': {
-        rest_api: 'base',
-        params: {
-            name:{type:'string'},
-            description:{type:'string'},
-            createdAt: {type:'time'},
-            modifiedAt:{type:'time'},
-        },
-        links:{
-
         }
     },
 };

@@ -43,7 +43,6 @@ function remove(data) {
             return {result: true};
         }
     });
-    // return retData;
 }
 
 module.exports = function restBusiness(options) {
