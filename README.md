@@ -5,7 +5,7 @@ rest-router-model是一个根据资源描述JOSN配置文件(Resource Config)，
 
 框架：目前只支持[koa](https://github.com/koajs/koa)上使用。
 
-数据库：目前只支持SQL系列数据库，如`Postgres`, `MSSQL`, `MySQL`, `MariaDB`, `SQLite3`, `Oracle`, `Amazon Redshift`。(以[knex](http://knexjs.org/)为准备)
+数据库：目前只支持SQL系列数据库，如`Postgres`, `MSSQL`, `MySQL`, `MariaDB`, `SQLite3`, `Oracle`, `Amazon Redshift`。(以[knex](http://knexjs.org/)为准)
 
 
 ### 安装
@@ -46,7 +46,7 @@ module.exports = {
             modifiedAt:{type:'time'},
         },
     },
-    // 活动组
+    // 活动组 （如：学生会、校蓝球队、...等）
     "activityGroup": {
         type: 'membershipContainer',
         rest_api: 'base',
@@ -131,14 +131,4 @@ restRouterModel.koaRestRouter(resourceConfig, extendBusinesses, knexConfig, opti
 |studentActivityGroupMemberships | DELETE   | /api/:version/studentActivityGroupMemberships/:uuid |
 
 
-
-```flow
-st=>start: Start
-op=>operation: Your Operation
-cond=>condition: Yes or No?
-e=>end
-
-st->op->cond
-cond(yes)->e
-cond(no)->op
-```
+###  待续... ...
