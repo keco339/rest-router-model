@@ -41,8 +41,26 @@ function generateResourceSchemaFn(resourceConfig,makeResourceHref, name, data) {
         // 复制生成URL链接类属性
         let urlParams = params.filter( param => resourceConfig[name].params[param].type == 'url');
         urlParams.forEach( param =>{
-            schema[param] = {href: data[`${param}`] || data[`${param}Href`] || null};}
-        );
+            let restParams = resourceConfig[name].params[param];
+            let isSaveHref = _.has(restParams, 'isSaveHref') ? restParams.isSaveHref : true;
+            if (isSaveHref) {
+                schema[param] = {href: data[`${param}`] || data[`${param}Href`] || null};
+            }
+            else {
+                let url = restParams.url;
+                if (url) {
+                    schema[param] = {href: _.template(url)(data) || null};
+                }
+                else {
+                    if (resourceConfig[param]) {
+                        schema[param] = {href: makeResourceHref(param, data[`${param}UUID`])};
+                    }
+                    else {
+                        schema[`${param}UUID`] = data[`${param}UUID`] || null;
+                    }
+                }
+            }
+        });
         // 生成上级资源链接
         let superResourceName = resourceConfig[name].super;
         if(superResourceName){

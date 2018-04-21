@@ -31,7 +31,13 @@ function createParse(resourceConfig, resource, data, params) {
         if (isPickUUID) {
             retData[`${key}UUID`] = utils.getLastResourceUUIDInURL(data[`${key}Href`]);
         }
-        retData[`${key}Href`] = data[`${key}Href`];
+        let isSaveHref = _.has(restParams[key], 'isSaveHref') ? restParams[key].isSaveHref : true;
+        if (isSaveHref) {
+            retData[`${key}Href`] = data[`${key}Href`];
+        }
+        else {
+            delete retData[`${key}Href`];
+        }
     });
     // 挂接上级资源UUID
     let superName = resourceConfig[resource].super;
