@@ -153,9 +153,18 @@ module.exports = function modelBase(bookshelf, params) {
         },
         idAttribute: 'uuid',
         hasTimestamps: ['createdAt', 'modifiedAt'],
+        format: function (data) {
+            let jsonColumnObj = (this.jsonColumns||[]).reduce((obj,item)=>{obj[item] = true;return obj;},{});
+            return _.mapValues(data, function(value, key) {
+                return jsonColumnObj[key]?JSON.stringify(value):value;
+            });
+        },
         parse: function(response) {
+            if(_.isArray(response)){return response;}
+            let jsonColumnObj = (this.jsonColumns||[]).reduce((obj,item)=>{obj[item] = true;return obj;},{});
             return _.mapValues(response, function(value, key) {
-                return _.isDate(value)?moment(value).format('YYYY-MM-DD HH:mm:ss'):value;
+                return _.isDate(value)?moment(value).format('YYYY-MM-DD HH:mm:ss'):
+                    jsonColumnObj[key]?JSON.parse(value):value;
             });
         },
 

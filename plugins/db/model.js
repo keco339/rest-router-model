@@ -20,14 +20,22 @@ module.exports = function dbModelBuilder(options) {
 
     resourceNames.forEach( name =>{
         console.log(`[DB Model Builder]-->create resource: ${name} type: db_model`);
-        let {dbName=null,super:superName=null}=resourceConfig[name];
+        let {dbName=null,super:superName=null,params={}}=resourceConfig[name];
 
         let ModelExtendObj = {
             tableName: dbName || inflection.camelize(inflection.pluralize(name)),
             // idAttribute: 'uuid',
             // hasTimestamps: ['createdAt','modifiedAt'],
             // parse: parse,
+            jsonColumns: [],
         };
+        // 添加json字段
+        _.keys(params).forEach(column=>{
+            if(params[column].type=='json'){
+                ModelExtendObj.jsonColumns.push(column);
+            }
+        });
+
         // 上级关系处理
         if(superName){
             ModelExtendObj[superName] = function () {

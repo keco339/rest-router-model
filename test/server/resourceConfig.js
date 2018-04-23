@@ -25,6 +25,7 @@ module.exports = {
             name: {type:'string'},
             email: {type:'string'},
             mobile: {type:'string'},
+            data: {type:'json'},
             createdAt: {type:'time'},
             modifiedAt:{type:'time'},
         },

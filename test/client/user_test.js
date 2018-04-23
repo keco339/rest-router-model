@@ -23,6 +23,7 @@ describe('User Test Case:',function () {
                     name: 'yiyp-test',
                     email: 'test@qq.com',
                     mobile: '13000000001',
+                    data: {test: 'test-abc'},
                     directoryHref: `http://192.168.7.5:3000/api/v1.0.0/directories/${directoryUUID}`
                 },
                 json: true, simple: true, resolveWithFullResponse: true
