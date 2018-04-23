@@ -15,7 +15,6 @@ function addHttpPrefix (ip,port,path) {
     return `http://${ip}:${port}${path}`;
 }
 
-
 function generateResourceSchemaFn(resourceConfig,makeResourceHref, name, data) {
 
     let membershipNames = _.keys(resourceConfig).filter(name=>_.isArray(resourceConfig[name].memberships));
@@ -94,7 +93,9 @@ function generateResourceSchemaFn(resourceConfig,makeResourceHref, name, data) {
         return schema;
     };
 }
-
+let generateResourceSchema = function(resourceName, data){};
+let generateListResourceSchema = function(resourceName, dataArray, offset, size, cxt){};
+let generateArrayResourceSchema = function(resourceName,dataArray){};
 
 const SingleSchemaMethods = ['create','get','update',];
 const ListSchemaMethods = ['list','listAll',];
@@ -107,7 +108,21 @@ module.exports = function schema(options) {
     let _addHttpPrefix = _.partial(addHttpPrefix,ip,port);
 
     let seneca = this;
-    let generateResourceSchema = generateResourceSchemaFn(resourceConfig,_makeResourceHref);
+    generateResourceSchema = generateResourceSchemaFn(resourceConfig,_makeResourceHref);
+    generateListResourceSchema = function(resourceName, dataArray, offset, size, cxt) {
+        return {
+            href: _addHttpPrefix(cxt.request.originalUrl),
+            offset, limit: dataArray.length, size,
+            items: dataArray.map(data => generateResourceSchema(resourceName, data)),
+        };
+    };
+    generateArrayResourceSchema = function(resourceName,dataArray){
+        return dataArray.map(data=>generateResourceSchema(resourceName,data));
+    };
+
+    // schema.generateResourceSchema = generateResourceSchema;
+    // schema.generateListResourceSchema = generateListResourceSchema;
+    // schema.generateArrayResourceSchema = generateArrayResourceSchema;
 
     _.keys(resourceConfig).forEach( name =>{
         console.log(`[Schema Register]--> resource: ${name} type: schema`);
@@ -119,16 +134,11 @@ module.exports = function schema(options) {
                 if(method!='get'){
                     console.log(`[REST Schema]--> \n${JSON.stringify(schema,null,2)}`);
                 }
-
             }
             else if(_.indexOf(ListSchemaMethods, method) > -1){
                 let {offset=0,size=0,items={}} = data;
                 let dataArray = _.isArray(items) ? items : [items];
-                schema = {
-                    href: _addHttpPrefix(cxt.request.originalUrl),
-                    offset ,limit:dataArray.length,size,
-                    items: dataArray.map(data=>generateResourceSchema(name,data)),
-                };
+                schema = generateListResourceSchema(name,dataArray,offset, size, cxt);
                 console.log(`[REST Schema]--> list offset:${schema.offset}, limit:${schema.limit}, size:${schema.size}, items.length:${items.length}`);
             }
             else if(_.indexOf(ArraySchemaMethods, method) > -1){
@@ -142,5 +152,14 @@ module.exports = function schema(options) {
             done(null,schema);
         });
     });
-
 };
+module.exports.getSchema = function () {
+    return {
+        generateResourceSchema,
+        generateListResourceSchema,
+        generateArrayResourceSchema,
+    }
+};
+
+
+

@@ -55,7 +55,7 @@ exports.errorReturn = (error)=>{
     else {
         return {
             name : ((error && error.name) ? error.name:'Error'),
-            statusCode: error.statusCode || 500,
+            statusCode: error.statusCode || error.status || 500,
             code : ((error && error.code) ? error.code:9999),
             message : ((error &&error.message) ? error.message : 'Unknown Error'),
             description : ((error &&error.description) ? error.description : ''),

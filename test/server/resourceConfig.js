@@ -18,6 +18,7 @@ module.exports = {
             {name:'sexSta', method:'GET', statusCode:200},
             {name:'fun', method:'GET', statusCode:200},
             {name: 'st', type: 'object', method: 'GET', statusCode: 200},
+            {name:'list', method:'GET',url: '/api/:version/m/:mid/users', statusCode:200},
         ],
 
         params: {

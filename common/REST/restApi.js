@@ -58,7 +58,7 @@ function handleFn (method,statusCode) {
                 }
                 // 2、 Business处理
                 if(seneca.has( {resource: this.name, type:'business'} )){
-                    ret = await seneca.actAsync({resource: this.name,type:'business',schema:data.schema, method, data:ret});
+                    ret = await seneca.actAsync({resource: this.name,type:'business',schema:data.schema, method, cxt: data.ctx, data:ret});
                 }
                 // 3、 数据返回schema
                 if(seneca.has( {resource: this.name, type:'schema', schema:data.schema} )){
@@ -68,8 +68,9 @@ function handleFn (method,statusCode) {
                 return ret;
             }
             catch (error){
+                if(error.seneca){error=error.orig;}
                 if(utils.isDBError(error)){error=utils.DBError(error);}
-                console.error(error.orig || error);
+                console.error(error || err);
                 let body = utils.errorReturn(error);
                 data.ctx.status = body.statusCode;
                 return body;

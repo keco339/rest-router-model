@@ -22,11 +22,12 @@ bookshelf.plugin('pagination');
 // bookshelf.plugin(require('bookshelf-modelbase').pluggable);
 bookshelf.plugin(require('../common/db/bookshelf-CRUD').pluggable);
 
-
 function parse (response) {
     if(_.isArray(response)){return response;}
+    let jsonColumnObj = (this.jsonColumns||[]).reduce((obj,item)=>{obj[item] = true;return obj;},{});
     return _.mapValues(response, function(value, key) {
-        return _.isDate(value)?moment(value).format('YYYY-MM-DD HH:mm:ss'):value;
+        return _.isDate(value)?moment(value).format('YYYY-MM-DD HH:mm:ss'):
+            jsonColumnObj[key]?JSON.parse(value):value;
     });
 }
 
@@ -59,7 +60,15 @@ let User = bookshelf.Model.extend({
     tableName: 'Users',
     idAttribute: 'uuid',
     hasTimestamps: ['createdAt','modifiedAt'],
-    parse: parse,
+    // format: function (data) {
+    //     let jsonColumnObj = (this.jsonColumns||[]).reduce((obj,item)=>{obj[item] = true;return obj;},{});
+    //     return _.mapValues(data, function(value, key) {
+    //         return jsonColumnObj[key]?JSON.stringify(value):value;
+    //     });
+    // },
+    // parse: parse,
+
+    jsonColumns: ['data'],
 
     directory: function() {
         return this.belongsTo(Directory,'directoryUUID');
@@ -94,9 +103,37 @@ let UserGroupMembership = bookshelf.Model.extend({
     }
 });
 
+
+
+
+
 let time = moment().format('YYYY-MM-DD HH:mm:ss');
 let userUUID = utils.createUUID();
-userUUID = 'PVldWwwAcidHY0Sb2aclzw';
+User.create({uuid:userUUID,data:{a:'test1'}}).then(data=>{
+    console.log(JSON.stringify(data,null,2))
+});
+
+//
+// Directory.forge({uuid:'UONWXg9bfoBvRkoDOlNxjg'}).fetch({withRelated: ['users']}).then(directory=>{
+//     console.log(`directory: ${JSON.stringify(directory.toJSON(),null,2)}`);
+// });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 let data = {
     "uuid": utils.createUUID(),
@@ -139,8 +176,8 @@ let $upSupers = [
     }
 ];
 
-User.listByUpSpuers($upSupers, qs).then(users => {
-    console.log('users:',JSON.stringify(users,null,2));
-});
-console.log('======================');
+// User.listByUpSpuers($upSupers, qs).then(users => {
+//     console.log('users:',JSON.stringify(users,null,2));
+// });
+// console.log('======================');
 

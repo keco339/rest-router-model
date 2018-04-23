@@ -85,9 +85,21 @@ function getHTTPMethod(obj) {
 // 扩展接口描述 ==> URL map
 function extendApiMap(extend_api) {
     let extendMap={};
-    (extend_api || []).map(extend=>{
+    (extend_api || []).filter(extend=>!extend.url).map(extend=>{
         // [{name:'test',type:'object',method:'POST,GET'}]
         extendMap[extend.name] = {name: '',suffix: `/${extend.name}`};
+        extendMap[extend.name].suffix = (extend.type && extend.type == 'object') ? `/:uuid/${extend.name}` : `/${extend.name}`;
+        _.split(extend.method,',')
+            .map(method=>_.trim(method).toUpperCase())
+            .map(method=>{extendMap[extend.name][method]=true;});
+    });
+    return extendMap;
+}
+function extendAliasApiMap(extend_api) {
+    let extendMap={};
+    (extend_api || []).filter(extend=>extend.url).map(extend=>{
+        extendMap[extend.name] = {name: '',suffix: `/${extend.name}`};
+        extendMap[extend.name].alias = extend.url;
         extendMap[extend.name].suffix = (extend.type && extend.type == 'object') ? `/:uuid/${extend.name}` : `/${extend.name}`;
         _.split(extend.method,',')
             .map(method=>_.trim(method).toUpperCase())
@@ -135,7 +147,7 @@ function generateRouteMaps(resourceConfig) {
         let map = _.assign({},extendMap,baseMap);
         // 生成获取资源URL前缀
         let prefixs = getAllUriPrefixs(resourceConfig, name);
-        return prefixs.map(prefix=>{
+        let rm = prefixs.map(prefix=>{
             {
                 // 打印URI路径信息
                 _.keys(map).forEach(action => {
@@ -146,12 +158,21 @@ function generateRouteMaps(resourceConfig) {
                         postfix: null,
                         suffix: map[action].suffix
                     };
-                    let uri = buildPath(route);
+                    let uri = route.alias || buildPath(route);
                     logUriMap(name, action, map, uri);
                 });
             }
             return {pin: jsonic.stringify({resource: name, type:'api',action: '*'}), prefix, map };
         });
+        {
+            let map2 = extendAliasApiMap(resourceConfig[name].extend_api);
+            // 打印URI路径信息
+            _.keys(map2).forEach(action =>logUriMap(name, action, map2, map2[action].alias));
+            if(!_.isEmpty(map2)){
+                rm.push({pin: jsonic.stringify({resource: name, type:'api',action: '*'}), map:map2});
+            }
+        }
+        return rm;
     });
     // 生成在上上级资源下 列表下属资源
     let hasUpSuperResourceNames = resourceNames.filter(name => (resourceConfig[name].super && resourceConfig[resourceConfig[name].super].super));
@@ -202,7 +223,6 @@ function generateRouteMaps(resourceConfig) {
 
         return {pin: jsonic.stringify({resource: name, type: 'api', action: '*'}), prefix: uri, map};
     });
-
 
     return [...routeMaps, ...membershipRouteMaps, ...upSuperMaps];
 }

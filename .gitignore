@@ -60,3 +60,4 @@ typings/
 /node_modules/
 /.idea/
 /logs/
+/test/server/doc/MicroServiceFrameDB.mwb.bak

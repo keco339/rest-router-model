@@ -66,7 +66,7 @@ module.exports = function restBusiness(options) {
     _.keys(resourceConfig).forEach( name =>{
         console.log(`[Business Register]--> resource: ${name} type: business`);
         seneca.add({resource: name, type:'business'}, (msg, done, internMeta)=>{
-            let {resource,method,schema,data}=msg;
+            let {resource,method,schema,cxt,data}=msg;
 
             if(!(method in businesses[resource])){
                 let errMsg = { code:1599,description: `the business of "${resource}" resource don't implement the "${method}" method`};
@@ -78,16 +78,16 @@ module.exports = function restBusiness(options) {
             let _functionType = Object.prototype.toString.call(_fn);
             let resultPromise = null;
             if(_functionType==funcTag){
-                resultPromise = Promise.resolve(_fn.call(businesses[resource],data));
+                resultPromise = Promise.resolve(_fn.call(businesses[resource],data,cxt));
             }
             else if(_functionType==genTag){
-                resultPromise = co(_fn.call(businesses[resource],data));
+                resultPromise = co(_fn.call(businesses[resource],data,cxt));
             }
             else if(_functionType==asyncTag){
-                resultPromise = _fn.call(businesses[resource],data);
+                resultPromise = _fn.call(businesses[resource],data,cxt);
             }
             else {
-                resultPromise = Promise.resolve(data);
+                resultPromise = Promise.resolve(data,cxt);
             }
             resultPromise.then(result=>{done(null,_.isObject(result)?result:{result});}).catch(done);
         });
