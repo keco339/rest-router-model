@@ -64,7 +64,13 @@ module.exports = function koa(options, context, auth, routes, done) {
           let body = {};
 
           if (['POST', 'PUT'].indexOf(ctx.req.method) > -1) {
-            body = options.parseBody === false ? ctx.request.body : yield Parse(ctx);
+              if(options.parseBody){
+                  body = ctx.request.body = ctx.request.body? ctx.request.body : yield Parse(ctx,{limit: '10mb'});
+                  if (ctx.request.rawBody === undefined) ctx.request.rawBody = res.raw;
+              }
+              else {
+                  body = ctx.request.body
+              }
           }
 
           const query = Object.assign({}, ctx.request.query);
