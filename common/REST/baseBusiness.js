@@ -33,7 +33,7 @@ class BaseBusiness{
             throw boom.notFound(errorCodeTable.code2Text(errMsg.code),errMsg);
         });
     }
-    getByUUID(uuid){return this.model.get({uuid});}
+    getByUUID(uuid){return this.get({uuid});}
     delete(uuid){
         let that = this;
         return this.model.delete(_.isObject(uuid)?uuid.uuid:uuid).catch(e=>{
