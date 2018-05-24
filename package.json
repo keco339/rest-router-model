@@ -1,6 +1,6 @@
 {
   "name": "rest-router-model",
-  "version": "1.2.1",
+  "version": "1.2.4",
   "description": " rest-router-model",
   "repository": {
     "type": "git",
@@ -22,6 +22,7 @@
     "co": "^4.6.0",
     "co-body": "^5.1.1",
     "develop-utils": "0.0.6",
+    "graphql": "^0.13.2",
     "inflection": "^1.12.0",
     "joi": "^13.1.2",
     "jsonic": "^0.3.0",
@@ -29,6 +30,7 @@
     "koa-router": "^7.3.0",
     "lodash": "^4.17.4",
     "moment": "^2.20.1",
+    "mongoose": "^5.0.17",
     "mysql": "^2.15.0",
     "seneca": "^3.4.3",
     "seneca-promise": "^1.1.1",
