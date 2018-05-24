@@ -25,6 +25,10 @@ const OrNotInReg = /^ORNOTIN\(((\w|-| |:|@|,|\[|\])*)\)$/;
 
 function queryString2SQL(queryBuilder, qs, table = null) {
     _.forEach(qs,(value, key) =>{
+        if(key=='$sql'){
+            queryBuilder.whereRaw(value);
+            return;
+        }
         let TableKey = table ? `${table}.${key}` : key;
         if(_.isEmpty(value)){
             queryBuilder.whereNull(TableKey);
