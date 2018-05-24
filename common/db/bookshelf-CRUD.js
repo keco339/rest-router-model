@@ -225,12 +225,18 @@ module.exports = function modelBase(bookshelf, params) {
         // 列表所有
         listAll: function (filter, options) {
             filter = extend({},filter);
+
+            let {orderBy=`${this.hasTimestamps[0]} desc`} = filter;
+            let orderBys = orderBy.split(',').map(str=>str.split(' '));
+
             let that = this;
-            return this.query(function (qb) {
-                that.queryString2SQL(qb,filter);
-            }).fetchAll(options).then(rows=>{
+            let  objTemp = this.query(function (qb) {
+                that.queryString2SQL(qb,_.omit(filter,['orderBy']));
+            });
+            objTemp = orderBys.reduce((obj,[sort,order])=> obj.orderBy(sort,order),objTemp);
+            return objTemp.fetchAll(options).then(rows=>{
                 return {size:rows.length,items: rows.toJSON()};
-            })
+            });
         },
         // 分页列表
         list: function (filter,options) {
