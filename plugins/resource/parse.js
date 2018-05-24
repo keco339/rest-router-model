@@ -5,7 +5,7 @@ const _ = require('lodash');
 const moment = require('moment');
 const utils = require('../../common/utils');
 
-function createParse(resourceConfig, resource, data, params) {
+function createParse(resourceConfig, resource, data, params={}) {
     let retData={};
     // 提取字段
     let restParams = resourceConfig[resource].params || {};
@@ -174,3 +174,5 @@ module.exports = function parse(options) {
     });
 
 };
+
+module.exports.parse = createParse;
