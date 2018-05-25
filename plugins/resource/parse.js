@@ -9,7 +9,7 @@ function createParse(resourceConfig, resource, data, params={}) {
     let retData={};
     // 提取字段
     let restParams = resourceConfig[resource].params || {};
-    let restParamKeys = _.keys(restParams);
+    let restParamKeys = _.keys(restParams).filter(key=>!restParams[key].isSchema);
     let defaultValueKeys = restParamKeys.filter(key => _.has(restParams[key], 'value'));
     // let jsonKeys =  _.keys(restParams).filter(key=>_.toLower(restParams[key].type)=='json');
     let hrefKeys = restParamKeys.filter(key => _.toLower(restParams[key].type) == 'url');

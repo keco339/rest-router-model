@@ -48,7 +48,11 @@ function generateResourceSchemaFn(resourceConfig,makeResourceHref, name, data) {
             else {
                 let url = restParams.url;
                 if (url) {
-                    schema[param] = {href: _.template(url)(data) || null};
+                    let regex = new RegExp(/\$\{(\w+)\}/g);
+                    let array = null, keys = [];
+                    while ((array = regex.exec(url)) !== null) { keys.push(array[1]);}
+                    let hasKeys = keys.filter(key => !!data[key]);
+                    schema[param] = {href:  (keys.length==hasKeys.length?_.template(url)(data):null) || null};
                 }
                 else {
                     if (resourceConfig[param]) {
