@@ -378,6 +378,14 @@ module.exports = function modelBase(bookshelf, params) {
             dataArray = _.isArray(dataArray)?dataArray:[dataArray];
             return bookshelf.knex.insert(dataArray).into(this.prototype.tableName).then((result)=>dataArray);
         },
+        // 批量更新。
+        batchUpdate: function (data) {
+            let uuids = data.uuid;
+            delete data.uuid;
+            return bookshelf.knex(this.prototype.tableName).update(data).whereIn('uuid',uuids).then((result)=>{
+                return  uuids.map(uuid=>_.assign({}, data,{uuid}));
+            });
+        },
     });
 
     return model

@@ -29,7 +29,7 @@ function createParse(resourceConfig, resource, data, params={}) {
     hrefKeys.forEach(key => {
         let isPickUUID = _.has(restParams[key], 'isPickUUID') ? restParams[key].isPickUUID : true;
         if (isPickUUID) {
-            retData[`${key}UUID`] = utils.getLastResourceUUIDInURL(data[`${key}Href`]);
+            retData[`${key}UUID`] = data[`${key}UUID`] || utils.getLastResourceUUIDInURL(data[`${key}Href`]);
         }
         let isSaveHref = _.has(restParams[key], 'isSaveHref') ? restParams[key].isSaveHref : true;
         if (isSaveHref) {
@@ -164,6 +164,32 @@ module.exports = function parse(options) {
             else if(method=='batchCreate'){
                 body = _.isArray(body)?body:[body];
                 retData = body.map(data=>createParse(resourceConfig,resource,data,params))
+            }
+            else if(method=='batchUpdate'){
+                // 提取字段
+                let restParams = resourceConfig[resource].params || {};
+                let restParamKeys = _.keys(restParams);
+                let hrefKeys = restParamKeys.filter(key=>_.toLower(restParams[key].type)=='url');
+                // 复制基础类型数据
+                retData = _.assign(retData, body);
+                // 复制转换Href
+                hrefKeys.forEach(key=>{
+                    if(!body[`${key}Href`]) return;
+                    let isPickUUID = _.has(restParams[key],'isPickUUID')?restParams[key].isPickUUID:true;
+                    if(isPickUUID){
+                        retData[`${key}UUID`] = body[`${key}UUID`] || utils.getLastResourceUUIDInURL(body[`${key}Href`]);
+                    }
+                    retData[`${key}Href`] = body[`${key}Href`];
+                });
+                // 挂接上级资源UUID
+                let superName = resourceConfig[resource].super;
+                if( superName && !_.isEmpty(_.trim(superName))){
+                    if(retData[`${superName}Href`]){
+                        retData[`${superName}UUID`] = body[`${superName}UUID`] ||utils.getLastResourceUUIDInURL(retData[`${superName}Href`]);
+                        delete retData[`${superName}Href`];
+                    }
+                }
+                retData.modifiedAt = moment().format('YYYY-MM-DD HH:mm:ss');
             }
             else {
                 retData={params,query,body}
