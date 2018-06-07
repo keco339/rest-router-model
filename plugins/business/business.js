@@ -54,7 +54,7 @@ module.exports = function restBusiness(options) {
     let businesses = {};
     resourceNames.forEach(name=>{
         let extendBusiness = extendBusinesses[name] || new BaseBusiness();
-        extendBusiness.init(name, models[name], knex, resourceConfig, models);
+        extendBusiness.init(name, models[name], knex, resourceConfig, models,businesses);
         if (resourceConfig[name].type == 'membershipContainer') {
             extendBusiness.add = add;
             extendBusiness.remove = remove;

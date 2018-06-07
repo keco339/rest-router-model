@@ -6,16 +6,17 @@ const boom = require('boom');
 const errorCodeTable = require('../errorCodeTable');
 
 class BaseBusiness{
-    constructor(name, model, dbOperater, resourceConfig, models) {
+    constructor(name, model, dbOperater, resourceConfig, models,businesses) {
         this.init(name, model, dbOperater, resourceConfig, models);
     }
 
-    init(name, model, dbOperater, resourceConfig, models) {
+    init(name, model, dbOperater, resourceConfig, models,businesses) {
         this.name = name;
         this.model = model;
         this.dbOperater = dbOperater;
         this.resourceConfig = resourceConfig;
         this.models = models;
+        this.businesses = businesses;
     }
     create(data){ return this.model.create(data);}
     update(data){
