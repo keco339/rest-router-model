@@ -166,30 +166,36 @@ module.exports = function parse(options) {
                 retData = body.map(data=>createParse(resourceConfig,resource,data,params))
             }
             else if(method=='batchUpdate'){
-                // 提取字段
-                let restParams = resourceConfig[resource].params || {};
-                let restParamKeys = _.keys(restParams);
-                let hrefKeys = restParamKeys.filter(key=>_.toLower(restParams[key].type)=='url');
-                // 复制基础类型数据
-                retData = _.assign(retData, body);
-                // 复制转换Href
-                hrefKeys.forEach(key=>{
-                    if(!body[`${key}Href`]) return;
-                    let isPickUUID = _.has(restParams[key],'isPickUUID')?restParams[key].isPickUUID:true;
-                    if(isPickUUID){
-                        retData[`${key}UUID`] = body[`${key}UUID`] || utils.getLastResourceUUIDInURL(body[`${key}Href`]);
+                body.data = body.data.map(dataItem=>{
+                    // 提取字段
+                    let restParams = resourceConfig[resource].params || {};
+                    let restParamKeys = _.keys(restParams);
+                    let hrefKeys = restParamKeys.filter(key=>_.toLower(restParams[key].type)=='url');
+                    // 复制基础类型数据
+                    let singleRetData;
+                    singleRetData = _.assign(singleRetData, dataItem);
+                    // 复制转换Href
+                    hrefKeys.forEach(key=>{
+                        if(!dataItem[`${key}Href`]) return;
+                        let isPickUUID = _.has(restParams[key],'isPickUUID')?restParams[key].isPickUUID:true;
+                        if(isPickUUID){
+                            singleRetData[`${key}UUID`] = dataItem[`${key}UUID`] || utils.getLastResourceUUIDInURL(dataItem[`${key}Href`]);
+                        }
+                        singleRetData[`${key}Href`] = dataItem[`${key}Href`];
+                    });
+                    // 挂接上级资源UUID
+                    let superName = resourceConfig[resource].super;
+                    if( superName && !_.isEmpty(_.trim(superName))){
+                        if(singleRetData[`${superName}Href`]){
+                            singleRetData[`${superName}UUID`] = dataItem[`${superName}UUID`] ||utils.getLastResourceUUIDInURL(dataItem[`${superName}Href`]);
+                            delete singleRetData[`${superName}Href`];
+                        }
                     }
-                    retData[`${key}Href`] = body[`${key}Href`];
+                    singleRetData.modifiedAt = moment().format('YYYY-MM-DD HH:mm:ss');
+                    return singleRetData;
                 });
-                // 挂接上级资源UUID
-                let superName = resourceConfig[resource].super;
-                if( superName && !_.isEmpty(_.trim(superName))){
-                    if(retData[`${superName}Href`]){
-                        retData[`${superName}UUID`] = body[`${superName}UUID`] ||utils.getLastResourceUUIDInURL(retData[`${superName}Href`]);
-                        delete retData[`${superName}Href`];
-                    }
-                }
-                retData.modifiedAt = moment().format('YYYY-MM-DD HH:mm:ss');
+
+                retData = body;
             }
             else if(method=='batchDelete'){
                 retData.uuid = query.uuid;

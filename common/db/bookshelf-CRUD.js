@@ -380,11 +380,33 @@ module.exports = function modelBase(bookshelf, params) {
         },
         // 批量更新。
         batchUpdate: function (data) {
-            let uuids = data.uuid;
-            delete data.uuid;
-            return bookshelf.knex(this.prototype.tableName).update(data).whereIn('uuid',uuids).then((result)=>{
-                return  uuids.map(uuid=>_.assign({}, data,{uuid}));
-            });
+            let tableName = this.prototype.tableName;
+            if(data.type == 'same')
+            {
+                let uuids = data.data.map(dataItem=>dataItem.uuid);
+                let updateData = data.data[0];
+                delete updateData.uuid;
+                return bookshelf.knex(tableName).update(updateData).whereIn('uuid',uuids).then((result)=>{
+                    //return  uuids.map(uuid=>_.assign({}, updateData,{uuid}));
+                    return data.data;
+                });
+            }
+            else
+            {
+                return bookshelf.knex.transaction(function (trx) {
+                    Promise.resolve('start').then(function (pluginResults) {
+                        let updateReq = data.data.map(dataItem=>
+                            bookshelf.knex(tableName).update(dataItem).where('uuid', dataItem.uuid).transacting(trx));
+                        return Promise.all(updateReq);
+                    })
+                        .then(trx.commit)
+                        .catch(trx.rollback);
+                })
+                    .then(updateResults=> {
+                            return data.data;
+                        }
+                    );
+            }
         },
         batchDelete: function (data) {
             let uuids = data.uuid;
