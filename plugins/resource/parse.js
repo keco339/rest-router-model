@@ -191,6 +191,9 @@ module.exports = function parse(options) {
                 }
                 retData.modifiedAt = moment().format('YYYY-MM-DD HH:mm:ss');
             }
+            else if(method=='batchDelete'){
+                retData.uuid = query.uuid;
+            }
             else {
                 retData={params,query,body}
             }

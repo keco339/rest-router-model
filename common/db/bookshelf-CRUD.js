@@ -386,6 +386,13 @@ module.exports = function modelBase(bookshelf, params) {
                 return  uuids.map(uuid=>_.assign({}, data,{uuid}));
             });
         },
+        batchDelete: function (data) {
+            let uuids = data.uuid;
+            delete data.uuid;
+            return bookshelf.knex(this.prototype.tableName).delete().whereIn('uuid',uuids).then((result)=>{
+                return true;
+            });
+        },
     });
 
     return model

@@ -63,6 +63,7 @@ class BaseBusiness{
     listAll(data){ return this.model.listAll(data);}
     batchCreate(data){ return this.model.batchCreate(data);}
     batchUpdate(data){ return this.model.batchUpdate(data);}
+    batchDelete(data){ return this.model.batchDelete(data);}
 }
 
 module.exports = BaseBusiness;
