@@ -56,7 +56,7 @@ function generateResourceSchemaFn(resourceConfig,makeResourceHref, name, data) {
                 }
                 else {
                     if (resourceConfig[param]) {
-                        schema[param] = {href: makeResourceHref(param, data[`${param}UUID`])};
+                        schema[param] = {href: data[`${param}UUID`]?makeResourceHref(param, data[`${param}UUID`]):null};
                     }
                     else {
                         schema[`${param}UUID`] = data[`${param}UUID`] || null;
