@@ -28,11 +28,15 @@ module.exports = function dbModelBuilder(options) {
             // hasTimestamps: ['createdAt','modifiedAt'],
             // parse: parse,
             jsonColumns: [],
+            dateColumns: [],
         };
         // 添加json字段
         _.keys(params).forEach(column=>{
             if(params[column].type=='json'){
                 ModelExtendObj.jsonColumns.push(column);
+            }
+            else if(params[column].type=='date'){
+                ModelExtendObj.dateColumns.push(column);
             }
         });
 

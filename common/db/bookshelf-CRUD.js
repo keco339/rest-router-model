@@ -159,16 +159,34 @@ module.exports = function modelBase(bookshelf, params) {
         hasTimestamps: ['createdAt', 'modifiedAt'],
         format: function (data) {
             let jsonColumnObj = (this.jsonColumns||[]).reduce((obj,item)=>{obj[item] = true;return obj;},{});
+            let dateColumnObj = (this.dateColumns||[]).reduce((obj,item)=>{obj[item] = true;return obj;},{});
             return _.mapValues(data, function(value, key) {
-                return jsonColumnObj[key]?JSON.stringify(value):value;
+                if(jsonColumnObj[key]){
+                    return JSON.stringify(value);
+                }
+                else if(dateColumnObj[key]){
+                    return _.isDate(value)?moment(value).format('YYYY-MM-DD'):value;
+                }
+                else {
+                    return value;
+                }
             });
         },
         parse: function(response) {
             if(_.isArray(response)){return response;}
             let jsonColumnObj = (this.jsonColumns||[]).reduce((obj,item)=>{obj[item] = true;return obj;},{});
+            let dateColumnObj = (this.dateColumns||[]).reduce((obj,item)=>{obj[item] = true;return obj;},{});
             return _.mapValues(response, function(value, key) {
-                return _.isDate(value)?moment(value).format('YYYY-MM-DD HH:mm:ss'):
-                    jsonColumnObj[key]?JSON.parse(value):value;
+                if(_.isDate(value)){
+                    let format = dateColumnObj[key]?'YYYY-MM-DD':'YYYY-MM-DD HH:mm:ss';
+                    return moment(value).format(format);
+                }
+                else if(jsonColumnObj[key]){
+                    return JSON.parse(value);
+                }
+                else {
+                    return value;
+                }
             });
         },
 
