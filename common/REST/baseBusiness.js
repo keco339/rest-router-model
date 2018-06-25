@@ -22,7 +22,7 @@ class BaseBusiness{
     update(data){
         let that = this;
         return this.model.update(data).catch(e=>{
-            let errMsg = { code:1599,description: `resource: ${that.name}, uuid: ${data.uuid}`};
+            let errMsg = { code:1599,description: `resource: ${that.name}, uuid: ${data.uuid},error:${e.message}`};
             throw boom.notFound(errorCodeTable.code2Text(errMsg.code),errMsg);
         });
     }
@@ -30,7 +30,7 @@ class BaseBusiness{
         let that = this;
         return this.model.getOne(data).then(obj=>{
             if(obj){ return obj;}
-            let errMsg = { code:1599,description: `resource: ${that.name}, uuid: ${data.uuid}`};
+            let errMsg = { code:1599,description: `resource: ${that.name}, uuid: ${data.uuid},error:${e.message}`};
             throw boom.notFound(errorCodeTable.code2Text(errMsg.code),errMsg);
         });
     }
@@ -38,7 +38,7 @@ class BaseBusiness{
     delete(uuid){
         let that = this;
         return this.model.delete(_.isObject(uuid)?uuid.uuid:uuid).catch(e=>{
-            let errMsg = { code:1599,description: `resource: ${that.name}, uuid: ${uuid}`};
+            let errMsg = { code:1599,description: `resource: ${that.name}, uuid: ${uuid},error:${e.message}`};
             throw boom.notFound(errorCodeTable.code2Text(errMsg.code),errMsg);
         });
     }
