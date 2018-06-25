@@ -20,8 +20,8 @@ function generateResourceSchemaFn(resourceConfig,makeResourceHref, name, data) {
     let membershipNames = _.keys(resourceConfig).filter(name=>_.isArray(resourceConfig[name].memberships));
     let membershipRouteMaps = _.forEach(membershipNames, mName=>{
         let [lName,rName] = resourceConfig[mName].memberships;
-        resourceConfig[lName].memberships = [mName,rName];
-        resourceConfig[rName].memberships = [mName,lName];
+        resourceConfig[lName].memberships = _.concat(resourceConfig[lName].memberships||[], [mName,rName]);
+        resourceConfig[rName].memberships = _.concat(resourceConfig[rName].memberships||[], [mName,lName]);
     });
 
     return function (name, data) {
