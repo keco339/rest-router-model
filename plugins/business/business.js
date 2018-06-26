@@ -6,44 +6,7 @@ const co = require('co');
 const boom = require('boom');
 const errorCodeTable = require('../../common/errorCodeTable');
 const dbModelBuilder    = require('../db/model');
-const utils = require('../../common/utils');
-const inflection = require('inflection');
-
-let BaseBusiness = require('../../common/REST/baseBusiness');
-
-
-function add(data) {
-    let [membershipName, otherName] = this.resourceConfig[this.name].memberships;
-    let retData = {
-        [`${otherName}UUID`]: utils.getResourceUUIDInURL(_.get(data, `body.${otherName}Href`), inflection.pluralize(otherName)),
-        [`${this.name}UUID`]: _.get(data, 'params.uuid'),
-    };
-    let membershipModel = this.models[membershipName];
-    return membershipModel.getOne(retData).then(membership => {
-        if (membership) {
-            return membership;
-        } else {
-            retData.uuid = utils.createUUID();
-            return membershipModel.create(retData);
-        }
-    });
-}
-
-function remove(data) {
-    let [membershipName, otherName] = this.resourceConfig[this.name].memberships;
-    let retData = {
-        [`${otherName}UUID`]: utils.getResourceUUIDInURL(_.get(data, `body.${otherName}Href`), inflection.pluralize(otherName)),
-        [`${this.name}UUID`]: _.get(data, 'params.uuid'),
-    };
-    let membershipModel = this.models[membershipName];
-    return membershipModel.getOne(retData).then(membership => {
-        if (membership) {
-            return membershipModel.delete(membership.uuid);
-        } else {
-            return {result: true};
-        }
-    });
-}
+const BaseBusiness = require('../../common/REST/baseBusiness');
 
 module.exports = function restBusiness(options) {
     let seneca = this;
@@ -55,10 +18,6 @@ module.exports = function restBusiness(options) {
     resourceNames.forEach(name=>{
         let extendBusiness = extendBusinesses[name] || new BaseBusiness();
         extendBusiness.init(name, models[name], knex, resourceConfig, models,businesses);
-        if (resourceConfig[name].type == 'membershipContainer') {
-            extendBusiness.add = add;
-            extendBusiness.remove = remove;
-        }
         businesses[name] = extendBusiness;
     });
 

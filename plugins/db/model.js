@@ -58,11 +58,12 @@ module.exports = function dbModelBuilder(options) {
             });
             // 多对多membership关系处理
             let memberships = resourceConfig[name].memberships;
-            if(memberships && _.isArray(memberships) && memberships.length==2){
-                let [membershipName,otherName] = resourceConfig[name].memberships;
-                ModelExtendObj[inflection.pluralize(otherName)] = function() {
-                    return this.belongsToMany(models[otherName]).through(models[membershipName],`${name}UUID`,`${otherName}UUID`);
-                };
+            if(memberships && _.isArray(memberships) /*&& memberships.length==2*/){
+                _.chunk(resourceConfig[name].memberships,2).map(([membershipName, otherName])=>{
+                    ModelExtendObj[inflection.pluralize(otherName)] = function() {
+                        return this.belongsToMany(models[otherName]).through(models[membershipName],`${name}UUID`,`${otherName}UUID`);
+                    };
+                });
             }
         }
         else {

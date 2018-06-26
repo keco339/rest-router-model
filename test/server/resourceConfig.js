@@ -45,6 +45,7 @@ module.exports = {
     'group':{
         rest_api: 'base',
         type: 'membershipContainer',
+        abilities: ['membershipContainer'],
         super: 'tenant',
         params:{
             name:{type:'string'},
@@ -60,6 +61,27 @@ module.exports = {
         memberships : ['user','group'],
         params:{
             user:{type:'url'},
+            group:{type:'url'},
+            createdAt: {type:'time'},
+            modifiedAt:{type:'time'},
+        }
+    },
+
+    'tree':{
+        rest_api: 'base',
+        abilities: ['tree'],
+        params:{
+            name:{type:'string'},
+            createdAt: {type:'time'},
+            modifiedAt:{type:'time'},
+        }
+    },
+    'treeGroupMembership':{
+        type: 'membership',
+        rest_api: 'base',
+        memberships : ['tree','group'],
+        params:{
+            tree:{type:'url'},
             group:{type:'url'},
             createdAt: {type:'time'},
             modifiedAt:{type:'time'},

@@ -15,15 +15,7 @@ function addHttpPrefix (ip,port,path) {
     return `http://${ip}:${port}${path}`;
 }
 
-function generateResourceSchemaFn(resourceConfig,makeResourceHref, name, data) {
-
-    let membershipNames = _.keys(resourceConfig).filter(name=>_.isArray(resourceConfig[name].memberships));
-    let membershipRouteMaps = _.forEach(membershipNames, mName=>{
-        let [lName,rName] = resourceConfig[mName].memberships;
-        resourceConfig[lName].memberships = _.concat(resourceConfig[lName].memberships||[], [mName,rName]);
-        resourceConfig[rName].memberships = _.concat(resourceConfig[rName].memberships||[], [mName,lName]);
-    });
-
+function generateResourceSchemaFn(resourceConfig,makeResourceHref ) {
     return function (name, data) {
         let params = _.keys(resourceConfig[name].params);
         let schema = {};

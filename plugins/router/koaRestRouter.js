@@ -10,13 +10,27 @@ const SenecaWeb = require('seneca-web');
 const {generateRouteMaps} = require('../resource/url');
 const seneca_web_adapter = require('../../common/REST/seneca-web-adapter-koa2-rest');
 
+const membershipContainerAbility = require('../ability/membershipContainer');
+
+
 module.exports = function restRouter(resourceConfig, extendBusinesses, dbConfig,options) {
     options = _.extend({serverName:'ServerName',ip:'localhost',port:3000}, options);
     resourceConfig = resourceConfig || {};
     extendBusinesses = extendBusinesses || {};
 
-    return new Promise((resolve, reject) => {
+    // 对resourceConfig数据结构进行格式化及缺省字段补齐， 如代码过多，将重构提取为函数
+    {
+        // 将membership资源转挂到两节点资源上
+        let membershipNames = _.keys(resourceConfig).filter(name=>_.isArray(resourceConfig[name].memberships));
+        _.forEach(membershipNames, mName=>{
+            let [lName,rName] = resourceConfig[mName].memberships;
+            resourceConfig[lName].memberships = _.concat(resourceConfig[lName].memberships||[], [mName,rName]);
+            resourceConfig[rName].memberships = _.concat(resourceConfig[rName].memberships||[], [mName,lName]);
+        });
+    }
 
+    return new Promise((resolve, reject) => {
+        // 初始化 Seneca 消息框架
         const seneca = Seneca({
             tag: options.serverName,
             timeout: 60 * 1000,
@@ -28,16 +42,24 @@ module.exports = function restRouter(resourceConfig, extendBusinesses, dbConfig,
         seneca.use(SenecaPromise);
         console.log(`[Seneca Start] --> id: ${seneca.id}, start_time : ${seneca.start_time} , tag : ${seneca.tag} , version : ${seneca.version}`);
 
-        _.keys(resourceConfig).forEach(name => {
-            if (resourceConfig[name].type == 'membershipContainer') {
-                let extend_api = resourceConfig[name].extend_api || [];
-                [['add', 201], ['remove', 204]]
-                    .filter(([method]) => _.findIndex(extend_api, obj => (obj.name == method)) == -1)
-                    .forEach(([method, statusCode]) => {
-                        extend_api.push({name: method, type: 'object', method: 'POST', statusCode: statusCode});
-                    });
 
-                resourceConfig[name].extend_api = extend_api;
+        // 更多扩展能力插入 abilities
+        _.keys(resourceConfig).forEach( name => {
+            let abilities = resourceConfig[name].abilities;
+            if(_.isArray(abilities)){
+                abilities.forEach( ability =>{
+                    if(ability == 'membershipContainer'){ // 关系容器添加、移出功能 // 只对关系型容器支持添加、移出
+                        if (resourceConfig[name].type == 'membershipContainer') {
+                            membershipContainerAbility.hook(resourceConfig, extendBusinesses, name);
+                        }
+                    }
+                    // else if(ability == 'tree'){
+                    //
+                    // }
+                    else {
+                        console.warn(`[Hook Ability] --> {resource:${name}} do not support "${ability}" ability!`)
+                    }
+                });
             }
         });
 

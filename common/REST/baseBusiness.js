@@ -30,7 +30,7 @@ class BaseBusiness{
         let that = this;
         return this.model.getOne(data).then(obj=>{
             if(obj){ return obj;}
-            let errMsg = { code:1599,description: `resource: ${that.name}, uuid: ${data.uuid},error:${e.message}`};
+            let errMsg = { code:1599,description: `resource: ${that.name}, uuid: ${data.uuid}`};
             throw boom.notFound(errorCodeTable.code2Text(errMsg.code),errMsg);
         });
     }
