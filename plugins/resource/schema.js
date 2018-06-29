@@ -20,7 +20,15 @@ function generateResourceSchemaFn(resourceConfig,makeResourceHref ) {
         let params = _.keys(resourceConfig[name].params);
         let schema = {};
         // 生成资源url
-        if(_.has(data,'uuid')){ schema.href = makeResourceHref(name,data.uuid);}
+        if(_.has(data,'id')){
+            schema.id = data.id;
+        }
+        if(_.has(data,'uuid')){
+            schema.href = makeResourceHref(name,data.uuid);
+            schema.uuid = data.uuid;
+        }
+
+
         // 复制非URL链接类属性
         let copeParams = params.filter( param => resourceConfig[name].params[param].type != 'url');
         let defaultValue = copeParams.reduce((obj,key)=>{
@@ -35,6 +43,7 @@ function generateResourceSchemaFn(resourceConfig,makeResourceHref ) {
             let restParams = resourceConfig[name].params[param];
             let isSaveHref = _.has(restParams, 'isSaveHref') ? restParams.isSaveHref : true;
             if (isSaveHref) {
+                schema[`${param}UUID`] =  data[`${param}UUID`] || null;
                 schema[param] = {href: data[`${param}`] || data[`${param}Href`] || null};
             }
             else {
@@ -48,6 +57,7 @@ function generateResourceSchemaFn(resourceConfig,makeResourceHref ) {
                 }
                 else {
                     if (resourceConfig[param]) {
+                        schema[`${param}UUID`] =  data[`${param}UUID`] || null;
                         schema[param] = {href: data[`${param}UUID`]?makeResourceHref(param, data[`${param}UUID`]):null};
                     }
                     else {
@@ -60,6 +70,7 @@ function generateResourceSchemaFn(resourceConfig,makeResourceHref ) {
         let superResourceName = resourceConfig[name].super;
         if(superResourceName){
             let superResourceUUID = data[`${superResourceName}UUID`];
+            schema[`${superResourceName}UUID`] = superResourceUUID || null;
             schema[superResourceName] = {href:superResourceUUID? makeResourceHref(superResourceName,superResourceUUID):null};
         }
         // 生成所有下级资源列表链接（包括下下级）
@@ -85,8 +96,29 @@ function generateResourceSchemaFn(resourceConfig,makeResourceHref ) {
                 schema[resourceName] = {href: resourceUUID? makeResourceHref(resourceName,resourceUUID):null};
             });
         }
+        // Tree树型结构资源链接
+        if(resourceConfig[name].isTree){
+            // 挂父级资源
+            let parentUUID = data[`parent${_.upperFirst(name)}UUID`];
+            schema[`parent${_.upperFirst(name)}UUID`] =  (parentUUID&&parentUUID!='root')?parentUUID:null;
+            schema[`parent${_.upperFirst(name)}`] = {href: (parentUUID&&parentUUID!='root')?makeResourceHref(name,parentUUID):null};
+            // 挂接下级子资源list资源链接
+            let subKey = `sub${_.upperFirst(inflection.pluralize(name))}`;
+            schema[subKey] = {href:`${makeResourceHref(name,data.uuid)}/${subKey}`};
+            // 挂接查询所有子资源链接
+            let allSubKey = `allSub${_.upperFirst(inflection.pluralize(name))}`;
+            schema[allSubKey] = {href:`${makeResourceHref(name,data.uuid)}/${allSubKey}`};
+        }
 
-        return schema;
+        // 编排字段顺序
+        let formatSchema = _.extend({},
+            _.pick(schema,['href','id','uuid']),
+            _.pick(schema,_.without(_.keys(schema).filter(key=>!_.isObject(schema[key])),'createdAt','modifiedAt')),
+            _.pick(schema,['createdAt','modifiedAt']),
+            _.pick(schema,_.keys(schema).filter(key=>_.isObject(schema[key])&&!_.has(schema[key],'href'))),
+            _.pick(schema,_.keys(schema).filter(key=>_.isObject(schema[key]))),
+            );
+        return formatSchema;
     };
 }
 let generateResourceSchema = function(resourceName, data){};

@@ -51,7 +51,6 @@ function remove(name, membershipName, otherName) {
 
 
 module.exports.hook = function hook(resourceConfig, extendBusinesses, name) {
-
     // 1、挂接URL
     let extend_api = resourceConfig[name].extend_api || [];
     let memberships = resourceConfig[name].memberships || [];
@@ -77,7 +76,4 @@ module.exports.hook = function hook(resourceConfig, extendBusinesses, name) {
         let removeMethod = `remove${_.upperFirst(otherName)}`;
         extendBusinesses[name][removeMethod] = remove(name, membershipName, otherName)
     });
-}
-
-
-
+};

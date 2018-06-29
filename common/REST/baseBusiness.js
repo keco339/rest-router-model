@@ -44,16 +44,16 @@ class BaseBusiness{
     }
     list(data){
         if (data.$membership) {
-            console.log('data.$membership');
+            // console.log('data.$membership');
             let {name,uuid}=data.$membership;
             return this.listByRelated(name,uuid,_.omit(data,['$membership']));
         }
         else if (data.$upSupers) {
-            console.log('data.$upSupers');
+            // console.log('data.$upSupers');
             return this.model.listByUpSpuers(data.$upSupers, _.omit(data, ['$upSupers']));
         }
         else {
-            console.log('data.list');
+            // console.log('data.list');
             return this.model.list(data);
         }
     }

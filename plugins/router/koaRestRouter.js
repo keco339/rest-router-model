@@ -10,7 +10,7 @@ const SenecaWeb = require('seneca-web');
 const {generateRouteMaps} = require('../resource/url');
 const seneca_web_adapter = require('../../common/REST/seneca-web-adapter-koa2-rest');
 
-const membershipContainerAbility = require('../ability/membershipContainer');
+const hookAbilities = require('../ability/hookAbilities');
 
 
 module.exports = function restRouter(resourceConfig, extendBusinesses, dbConfig,options) {
@@ -28,6 +28,10 @@ module.exports = function restRouter(resourceConfig, extendBusinesses, dbConfig,
             resourceConfig[rName].memberships = _.concat(resourceConfig[rName].memberships||[], [mName,lName]);
         });
     }
+    // 更多扩展能力插入 abilities
+    {
+        hookAbilities(resourceConfig, extendBusinesses);
+    }
 
     return new Promise((resolve, reject) => {
         // 初始化 Seneca 消息框架
@@ -41,27 +45,6 @@ module.exports = function restRouter(resourceConfig, extendBusinesses, dbConfig,
         seneca.fixedargs = {fatal$: false}; // fixedargs设置 使seneca抛出异常
         seneca.use(SenecaPromise);
         console.log(`[Seneca Start] --> id: ${seneca.id}, start_time : ${seneca.start_time} , tag : ${seneca.tag} , version : ${seneca.version}`);
-
-
-        // 更多扩展能力插入 abilities
-        _.keys(resourceConfig).forEach( name => {
-            let abilities = resourceConfig[name].abilities;
-            if(_.isArray(abilities)){
-                abilities.forEach( ability =>{
-                    if(ability == 'membershipContainer'){ // 关系容器添加、移出功能 // 只对关系型容器支持添加、移出
-                        if (resourceConfig[name].type == 'membershipContainer') {
-                            membershipContainerAbility.hook(resourceConfig, extendBusinesses, name);
-                        }
-                    }
-                    // else if(ability == 'tree'){
-                    //
-                    // }
-                    else {
-                        console.warn(`[Hook Ability] --> {resource:${name}} do not support "${ability}" ability!`)
-                    }
-                });
-            }
-        });
 
         // 资源接口插件
         seneca.use('../../plugins/resource/resources', resourceConfig);

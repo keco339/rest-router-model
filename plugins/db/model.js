@@ -20,10 +20,10 @@ module.exports = function dbModelBuilder(options) {
 
     resourceNames.forEach( name =>{
         console.log(`[DB Model Builder]-->create resource: ${name} type: db_model`);
-        let {dbName=null,super:superName=null,params={}}=resourceConfig[name];
+        let {tableName=null,super:superName=null,params={}}=resourceConfig[name];
 
         let ModelExtendObj = {
-            tableName: dbName || inflection.camelize(inflection.pluralize(name)),
+            tableName: tableName || inflection.camelize(inflection.pluralize(name)),
             // idAttribute: 'uuid',
             // hasTimestamps: ['createdAt','modifiedAt'],
             // parse: parse,

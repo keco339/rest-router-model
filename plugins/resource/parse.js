@@ -51,6 +51,14 @@ function createParse(resourceConfig, resource, data, params={}) {
         }
     }
     retData.createdAt = retData.modifiedAt = moment().format('YYYY-MM-DD HH:mm:ss');
+
+    // Tree树型结构初始父节点
+    if(resourceConfig[resource].isTree){
+        let parentUUIDKey = `parent${_.upperFirst(resource)}UUID`;
+        let parentHrefKey = `parent${_.upperFirst(resource)}Href`;
+        [parentUUIDKey,parentHrefKey].map(key=>{delete retData[key]});
+        retData[parentUUIDKey] = data[parentUUIDKey] ||  utils.getLastResourceUUIDInURL(data[parentHrefKey]) || 'root';
+    }
     return retData;
 }
 
@@ -96,6 +104,16 @@ module.exports = function parse(options) {
                     }
                 }
                 retData.modifiedAt = moment().format('YYYY-MM-DD HH:mm:ss');
+
+                // Tree树型结构父节点
+                if(resourceConfig[resource].isTree){
+                    let parentUUIDKey = `parent${_.upperFirst(resource)}UUID`;
+                    let parentHrefKey = `parent${_.upperFirst(resource)}Href`;
+                    if(_.has(body,parentUUIDKey)||_.has(body,parentHrefKey)){
+                        [parentUUIDKey, parentHrefKey].map(key=>{delete retData[key]});
+                        retData[parentUUIDKey] = body[parentUUIDKey] ||  utils.getLastResourceUUIDInURL(body[parentHrefKey]) || 'root';
+                    }
+                }
 
                 console.log(`[Parse Data] --> resource:${resource},method:${method} parse date:\n${JSON.stringify(retData,null,2)}`);
             }
@@ -147,6 +165,15 @@ module.exports = function parse(options) {
                             }
                         }
                     })
+                }
+                // Tree树型结构父节点
+                if(resourceConfig[resource].isTree){
+                    let parentUUIDKey = `parent${_.upperFirst(resource)}UUID`;
+                    let parentHrefKey = `parent${_.upperFirst(resource)}Href`;
+                    if(_.has(query,parentUUIDKey)||_.has(query,parentHrefKey)){
+                        [parentUUIDKey,parentHrefKey].map(key=>{delete retData[key]});
+                        retData[parentUUIDKey] = query[parentUUIDKey] ||  utils.getLastResourceUUIDInURL(query[parentHrefKey]) || 'root';
+                    }
                 }
                 console.log(`[Parse Data] --> resource:${resource},method:${method} parse date:\n${JSON.stringify(retData, null, 2)}`);
             }
