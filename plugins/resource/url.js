@@ -52,7 +52,7 @@ let RESTBatchMap = {
     batchGet: {GET: true, name: '',suffix: '/batchGet'},
     batchUpdate: {PUT: true,POST: true, name: '',suffix: '/batchUpdate'},
     listAll: {GET: true, name: '',suffix: '/listAll'},
-    batchDelete: {DELETE: true, name: '',suffix: '/batchDelete'},
+    batchDelete: {DELETE: true,POST: true, name: '',suffix: '/batchDelete'},
 };
 let RESTMap = _.assign({},RESTBatchMap,RESTBaseMap);
 

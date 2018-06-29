@@ -225,7 +225,7 @@ module.exports = function parse(options) {
                 retData = body;
             }
             else if(method=='batchDelete'){
-                retData.uuid = query.uuid;
+                retData.uuid = _.union(query.uuid, body.uuid);
             }
             else {
                 retData={params,query,body}

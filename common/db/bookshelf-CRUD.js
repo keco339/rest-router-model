@@ -223,7 +223,7 @@ module.exports = function modelBase(bookshelf, params) {
             let relateModel = relateCollection.relatedData.target.forge({uuid:relateModelUUID});
             let that = this;
 
-            let paginate =  relateModel.related(modelInstance.tableName.toLowerCase()).withPivot(['uuid']).query(function (qb) {
+            let paginate =  relateModel.related(_.lowerFirst(modelInstance.tableName)).withPivot(['uuid']).query(function (qb) {
                 let {offset=0,limit=10,orderBy=`${modelInstance.hasTimestamps[0]} desc`} = (filter||{});
                 let orderBys = orderBy.split(',').map(str=>str.split(' '));
 
@@ -233,7 +233,7 @@ module.exports = function modelBase(bookshelf, params) {
             }).fetch().then(users=>users.toJSON());
             // let paginate = [];
 
-            let obj = relateModel.related(modelInstance.tableName.toLowerCase());
+            let obj = relateModel.related(_.lowerFirst(modelInstance.tableName));
             let count = obj.query(function (qb) {
                 // qb.where(extend({}, _.omit(filter,['offset','limit','orderBy'])));
                 that.queryString2SQL(qb,_.omit(filter,['offset','limit','orderBy']));
