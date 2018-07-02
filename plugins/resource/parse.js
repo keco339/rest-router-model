@@ -31,7 +31,7 @@ function createParse(resourceConfig, resource, data, params={}) {
         if (isPickUUID) {
             retData[`${key}UUID`] = data[`${key}UUID`] || utils.getLastResourceUUIDInURL(data[`${key}Href`]);
         }
-        let isSaveHref = _.has(restParams[key], 'isSaveHref') ? restParams[key].isSaveHref : true;
+        let isSaveHref = _.has(restParams[key], 'isSaveHref') ? restParams[key].isSaveHref : (resourceConfig[key]?false:true);
         if (isSaveHref) {
             retData[`${key}Href`] = data[`${key}Href`];
         }
@@ -86,13 +86,18 @@ module.exports = function parse(options) {
                 // 复制基础类型数据
                 retData = _.assign(retData, body);
                 // 复制转换Href
-                hrefKeys.forEach(key=>{
-                    if(!body[`${key}Href`]) return;
-                    let isPickUUID = _.has(restParams[key],'isPickUUID')?restParams[key].isPickUUID:true;
-                    if(isPickUUID){
-                        retData[`${key}UUID`] = utils.getLastResourceUUIDInURL(body[`${key}Href`]);
+                hrefKeys.forEach(key => {
+                    let isPickUUID = _.has(restParams[key], 'isPickUUID') ? restParams[key].isPickUUID : true;
+                    if (isPickUUID) {
+                        retData[`${key}UUID`] = body[`${key}UUID`] || utils.getLastResourceUUIDInURL(body[`${key}Href`]);
                     }
-                    retData[`${key}Href`] = body[`${key}Href`];
+                    let isSaveHref = _.has(restParams[key], 'isSaveHref') ? restParams[key].isSaveHref : (resourceConfig[key]?false:true);
+                    if (isSaveHref) {
+                        retData[`${key}Href`] = body[`${key}Href`];
+                    }
+                    else {
+                        delete retData[`${key}Href`];
+                    }
                 });
 
                 // 挂接上级资源UUID
