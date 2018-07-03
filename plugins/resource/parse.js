@@ -87,6 +87,7 @@ module.exports = function parse(options) {
                 retData = _.assign(retData, body);
                 // 复制转换Href
                 hrefKeys.forEach(key => {
+                    if(!_.has(body,`${key}UUID`) && !_.has(body,`${key}Href`) ){return true;}
                     let isPickUUID = _.has(restParams[key], 'isPickUUID') ? restParams[key].isPickUUID : true;
                     if (isPickUUID) {
                         retData[`${key}UUID`] = body[`${key}UUID`] || utils.getLastResourceUUIDInURL(body[`${key}Href`]);
