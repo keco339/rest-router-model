@@ -40,7 +40,8 @@ module.exports = function restRouter(resourceConfig, extendBusinesses, dbConfig,
             timeout: 60 * 1000,
             log: 'silent',
             debug: {undead: true},
-            fixedargs: {fatal: false}
+            fixedargs: {fatal: false},
+            strict: { result: false},
         });
         seneca.fixedargs = {fatal$: false}; // fixedargs设置 使seneca抛出异常
         seneca.use(SenecaPromise);

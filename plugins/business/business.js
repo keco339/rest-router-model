@@ -48,7 +48,8 @@ module.exports = function restBusiness(options) {
             else {
                 resultPromise = Promise.resolve(data,cxt);
             }
-            resultPromise.then(result=>{done(null,_.isObject(result)?result:{result});}).catch(done);
+            // resultPromise.then(result=>{done(null,_.isObject(result)?result:{result});}).catch(done);
+            resultPromise.then(result=>{done(null,result);}).catch(done);
         });
     });
 };
