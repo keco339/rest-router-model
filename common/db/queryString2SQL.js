@@ -18,7 +18,7 @@ module.exports = function queryString2SQL(queryBuilder, qs, table = null) {
             return;
         }
         let TableKey = table ? `${table}.${key}` : key;
-        if(_.isEmpty(value)){
+        if(_.isNil(value)){
             queryBuilder.whereNull(TableKey);
         }
         else if(_.isString(value)){
@@ -107,9 +107,6 @@ module.exports = function queryString2SQL(queryBuilder, qs, table = null) {
         else if(_.isArray(value) && value.length>0){
             queryBuilder.whereIn(TableKey, value);
         }
-        else if(_.isEmpty(value)){
-            queryBuilder.whereNull(TableKey);
-        }
         else {
             queryBuilder.where(TableKey, '=', value);
         }
@@ -117,3 +114,4 @@ module.exports = function queryString2SQL(queryBuilder, qs, table = null) {
     return queryBuilder;
 };
 
+console.log(_.isNil());
