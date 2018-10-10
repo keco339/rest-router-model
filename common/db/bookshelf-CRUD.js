@@ -118,7 +118,8 @@ module.exports = function modelBase(bookshelf, params) {
         // 获取一个
         getOne: function (query,options) {
             options = extend({/*require: true*/}, options);
-            query = extend({},this.attributes,query);
+            // query = extend({},this.attributes,query);
+            query = extend({}, query);
             return this.__proto__.constructor.forge(query).fetch(options).then(data=>data?data.toJSON():null);
         },
         // 用主键获取一个
