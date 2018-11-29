@@ -65,7 +65,6 @@ function createParse(resourceConfig, resource, data, params={}) {
 module.exports = function parse(options) {
     let resourceConfig = options;
     let seneca = this;
-
     _.keys(resourceConfig).forEach( name =>{
         console.log(`[Parse Register]--> resource: ${name} type: parse`);
         seneca.add({resource: name, schema:'rest', type:'parse'}, (msg, done, internMeta)=>{
