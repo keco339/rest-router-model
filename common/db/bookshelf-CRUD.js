@@ -282,6 +282,8 @@ module.exports = function modelBase(bookshelf, params) {
         // 批量创建
         batchCreate: function (dataArray) {
             dataArray = _.isArray(dataArray)?dataArray:[dataArray];
+            let curCtx = this.forge();
+            dataArray = dataArray.map(dataItem=>curCtx.format(dataItem));
             return bookshelf.knex.insert(dataArray).into(this.prototype.tableName).then((result)=>dataArray);
         },
         // 批量更新。
