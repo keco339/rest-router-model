@@ -1,6 +1,6 @@
 {
   "name": "rest-router-model",
-  "version": "1.7.8",
+  "version": "1.7.10",
   "description": " rest-router-model",
   "repository": {
     "type": "git",
@@ -32,7 +32,7 @@
     "moment": "^2.20.1",
     "mongoose": "^5.0.17",
     "mysql": "^2.15.0",
-    "seneca": "^3.4.3",
+    "seneca": "3.7.0",
     "seneca-promise": "^1.1.1",
     "seneca-web": "^2.2.0",
     "uuid": "^3.2.1"

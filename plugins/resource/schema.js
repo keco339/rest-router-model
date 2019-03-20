@@ -54,6 +54,9 @@ function generateResourceSchemaFn(resourceConfig,makeResourceHref ) {
                     while ((array = regex.exec(url)) !== null) { keys.push(array[1]);}
                     let hasKeys = keys.filter(key => !!data[key]);
                     schema[param] = {href:  (keys.length==hasKeys.length?_.template(url)(data):null) || null};
+                    if(_.has(data,`${param}UUID`)){
+                        schema[`${param}UUID`] =  data[`${param}UUID`] || null;
+                    }
                 }
                 else {
                     if (resourceConfig[param]) {
