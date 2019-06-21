@@ -6,7 +6,9 @@ let _ = require('lodash');
 const RangeReg = /^((\[)|(\())(\w|-| |:|@)*,(\w|-| |:|@)*((\])|(\)))$/;
 const NotReg = /^NOT\(((\w|-| |:|@)*)\)$/;
 const NotInReg = /^NOTIN\(((\w|-| |:|@|,|\[|\])*)\)$/;
-const OrReg = /^OR\(((\w|-| |:|@)*)\)$/;
+// const OrReg = /^OR\(((\w|-| |:|@)*)\)$/;
+// const OrReg = /^OR\(((\w|-| |:|@|\*)*)\)$/;
+const OrReg = /^OR\(((.)*)\)$/;
 const OrNotReg = /^ORNOT\(((\w|-| |:|@)*)\)$/;
 const OrInReg = /^ORIN\(((\w|-| |:|@|,|\[|\])*)\)$/;
 const OrNotInReg = /^ORNOTIN\(((\w|-| |:|@|,|\[|\])*)\)$/;
@@ -24,8 +26,15 @@ module.exports = function queryString2SQL(queryBuilder, qs, table = null) {
         else if(_.isString(value)){
             // 模糊查询
             if ( value.indexOf('*') != -1) {
-                let v = value.replace(/\*/g, '%');
-                queryBuilder.where(TableKey, 'like', v);
+                if(OrReg.test(value)){
+                    let v1 = OrReg.exec(value)[1];
+                    let v = v1.replace(/\*/g, '%');
+                    queryBuilder.orWhere(TableKey, 'like', v);
+                }
+                else {
+                    let v = value.replace(/\*/g, '%');
+                    queryBuilder.where(TableKey, 'like', v);
+                }
             }
             // 区间查询
             else if(RangeReg.test(value)){
