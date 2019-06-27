@@ -14,6 +14,19 @@ const OrInReg = /^ORIN\(((\w|-| |:|@|,|\[|\])*)\)$/;
 const OrNotInReg = /^ORNOTIN\(((\w|-| |:|@|,|\[|\])*)\)$/;
 
 module.exports = function queryString2SQL(queryBuilder, qs, table = null) {
+
+    let MERGE_KEYS = qs.MERGE_KEYS || '';
+    delete qs['MERGE_KEYS'];
+    let mergeKeys = MERGE_KEYS.split(',').filter(key=>!_.isEmpty(key)).map(key=>_.trim(key))
+        .sort((k1,k2)=>(/^OR/.test(qs[k1]) && !(/^OR/.test(qs[k2]))));
+    let mergeQs = _.pick(qs,mergeKeys);
+    qs = _.omit(qs,mergeKeys);
+    if(!_.isEmpty(mergeQs)){
+        queryBuilder.where(function () {
+            queryString2SQL(this, mergeQs, table);
+        })
+    }
+
     _.forEach(qs,(value, key) =>{
         if(key=='$sql'){
             queryBuilder.whereRaw(value);
