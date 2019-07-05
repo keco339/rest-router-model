@@ -163,7 +163,7 @@ module.exports = function schema(options) {
             if(_.indexOf(SingleSchemaMethods, method) > -1){
                 schema = generateResourceSchema(name,data);
                 if(method!='get'){
-                    console.log(`[REST Schema]--> \n${JSON.stringify(schema,null,2)}`);
+                    console.log(`[REST Schema]--> ${JSON.stringify(schema,null,2)}`);
                 }
             }
             else if(_.indexOf(ListSchemaMethods, method) > -1){

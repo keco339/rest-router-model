@@ -73,7 +73,7 @@ module.exports = function parse(options) {
             let retData={};
             if(method=='create'){
                 retData = createParse(resourceConfig, resource, body, params);
-                console.log(`[Parse Data] --> resource:${resource},method:${method} parse date:\n${JSON.stringify(retData,null,2)}`);
+                console.log(`[Parse Data] --> resource:${resource},method:${method} parse date: ${JSON.stringify(retData,null,2)}`);
             }
             else if(method=='update'){
                 // 提取字段
@@ -120,7 +120,7 @@ module.exports = function parse(options) {
                     }
                 }
 
-                console.log(`[Parse Data] --> resource:${resource},method:${method} parse date:\n${JSON.stringify(retData,null,2)}`);
+                console.log(`[Parse Data] --> resource:${resource},method:${method} parse date: ${JSON.stringify(retData,null,2)}`);
             }
             else if(method=='get'){
                 retData.uuid = params.uuid;
@@ -180,7 +180,7 @@ module.exports = function parse(options) {
                         retData[parentUUIDKey] = query[parentUUIDKey] ||  utils.getLastResourceUUIDInURL(query[parentHrefKey]) || 'root';
                     }
                 }
-                console.log(`[Parse Data] --> resource:${resource},method:${method} parse date:\n${JSON.stringify(retData, null, 2)}`);
+                console.log(`[Parse Data] --> resource:${resource},method:${method} parse date: ${JSON.stringify(retData, null, 2)}`);
             }
             else if(method=='listAll'){
                 retData = _.assign({},query);
