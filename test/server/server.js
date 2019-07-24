@@ -1,6 +1,7 @@
 /**
  * Created by Administrator on 2018/1/8.
  */
+const _ = require('lodash');
 const log4js = require('./log4js');
 const package = require('../../package.json');
 const config = require('./config/config');
@@ -31,7 +32,18 @@ let options = {serverName: server_name, ip: ip, port: port};
 // let koa_router = restRouterModel.koaRestRouter(resourceConfig, extendBusinesses, config.knex, options);
 
 restRouterModel.koaRestRouter(resourceConfig, extendBusinesses, config.knex, options).then(koa_router => {
-    app.use(logger());
+    // app.use(logger());
+    app.use(async (ctx, next)=>{
+        const stripAnsi = require('strip-ansi');
+        ctx.seq = _.random(10000,99999);
+        await logger((str, args) => {
+            if( process.env['LOGCOLLECTION'] ==='open' ){
+                str = stripAnsi(str);
+            }
+            console.log(`[HTTP][${ctx.seq}]${str}`);
+        })(ctx, next);
+    });
+
     app.use(koa_router.routes());
 
     let server = app.listen(port);

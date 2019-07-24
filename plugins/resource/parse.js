@@ -68,12 +68,13 @@ module.exports = function parse(options) {
     _.keys(resourceConfig).forEach( name =>{
         console.log(`[Parse Register]--> resource: ${name} type: parse`);
         seneca.add({resource: name, schema:'rest', type:'parse'}, (msg, done, internMeta)=>{
-            let {resource,method,data:{args:{params,query,body}}}=msg;
-            console.debug(`[Parse Data] --> resource:${resource},method:${method}\n${JSON.stringify({params,query,body},null,2)}`);
+            let {resource,method,data:{args:{params,query,body},ctx}}=msg;
+            let seqStr = ctx.seq?`[${ctx.seq}]`:'';
+            console.debug(`[Parse Data]${seqStr} --> resource:${resource},method:${method},data: ${JSON.stringify({params,query,body},null,2)}`);
             let retData={};
             if(method=='create'){
                 retData = createParse(resourceConfig, resource, body, params);
-                console.log(`[Parse Data] --> resource:${resource},method:${method} parse date: ${JSON.stringify(retData,null,2)}`);
+                console.log(`[Parse Data]${seqStr} --> resource:${resource},method:${method},parse date: ${JSON.stringify(retData,null,2)}`);
             }
             else if(method=='update'){
                 // 提取字段
@@ -120,7 +121,7 @@ module.exports = function parse(options) {
                     }
                 }
 
-                console.log(`[Parse Data] --> resource:${resource},method:${method} parse date: ${JSON.stringify(retData,null,2)}`);
+                console.log(`[Parse Data]${seqStr} --> resource:${resource},method:${method} parse date: ${JSON.stringify(retData,null,2)}`);
             }
             else if(method=='get'){
                 retData.uuid = params.uuid;
@@ -180,7 +181,7 @@ module.exports = function parse(options) {
                         retData[parentUUIDKey] = query[parentUUIDKey] ||  utils.getLastResourceUUIDInURL(query[parentHrefKey]) || 'root';
                     }
                 }
-                console.log(`[Parse Data] --> resource:${resource},method:${method} parse date: ${JSON.stringify(retData, null, 2)}`);
+                console.log(`[Parse Data]${seqStr} --> resource:${resource},method:${method} parse date: ${JSON.stringify(retData, null, 2)}`);
             }
             else if(method=='listAll'){
                 retData = _.assign({},query);

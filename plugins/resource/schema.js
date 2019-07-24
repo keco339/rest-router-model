@@ -159,23 +159,24 @@ module.exports = function schema(options) {
         console.log(`[Schema Register]--> resource: ${name} type: schema`);
         seneca.add({resource: name, type:'schema',schema:'rest'}, (msg, done, internMeta)=>{
             let {method,cxt,data} = msg;
+            let seqStr = cxt.seq?`[${cxt.seq}]`:'';
             let schema = {};
             if(_.indexOf(SingleSchemaMethods, method) > -1){
                 schema = generateResourceSchema(name,data);
                 if(method!='get'){
-                    console.log(`[REST Schema]--> ${JSON.stringify(schema,null,2)}`);
+                    console.log(`[REST Schema]${seqStr} --> ${JSON.stringify(schema,null,2)}`);
                 }
             }
             else if(_.indexOf(ListSchemaMethods, method) > -1){
                 let {offset=0,size=0,items={}} = data;
                 let dataArray = _.isArray(items) ? items : [items];
                 schema = generateListResourceSchema(name,dataArray,offset, size, cxt);
-                console.log(`[REST Schema]--> list offset:${schema.offset}, limit:${schema.limit}, size:${schema.size}, items.length:${items.length}`);
+                console.log(`[REST Schema]${seqStr} --> list offset:${schema.offset}, limit:${schema.limit}, size:${schema.size}, items.length:${items.length}`);
             }
             else if(_.indexOf(ArraySchemaMethods, method) > -1){
                 let dataArray = _.isArray(data) ? data : [data];
                 schema = dataArray.map(data=>generateResourceSchema(name,data));
-                console.log(`[REST Schema]--> array length:${schema.length}`);
+                console.log(`[REST Schema]${seqStr} --> array length:${schema.length}`);
             }
             else {
                 schema = data;

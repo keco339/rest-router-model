@@ -135,5 +135,3 @@ module.exports = function queryString2SQL(queryBuilder, qs, table = null) {
     });
     return queryBuilder;
 };
-
-console.log(_.isNil());

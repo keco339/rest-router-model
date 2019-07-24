@@ -1,6 +1,6 @@
 {
   "name": "rest-router-model",
-  "version": "1.8.1",
+  "version": "1.8.2",
   "description": " rest-router-model",
   "repository": {
     "type": "git",
@@ -31,16 +31,16 @@
     "lodash": "^4.17.4",
     "moment": "^2.20.1",
     "mongoose": "^5.0.17",
-    "mysql": "^2.15.0",
-    "seneca": "3.7.0",
-    "seneca-promise": "^1.1.1",
+    "mysql": "^2.17.1",
+    "seneca": "^3.7.0",
+    "seneca-promise": "^1.1.2",
     "seneca-web": "^2.2.0",
     "uuid": "^3.2.1"
   },
   "devDependencies": {
     "chai": "^4.1.2",
     "koa": "^2.4.1",
-    "koa-logger": "^3.1.0",
+    "koa-logger": "^3.2.1",
     "log4js": "^2.5.3",
     "mocha": "^4.1.0",
     "request": "^2.83.0",
