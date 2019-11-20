@@ -13,7 +13,8 @@ module.exports = function dbModelBuilder(options) {
 
     knex = require('knex')(dbConfig);
     bookshelf = require('bookshelf')(knex);
-    bookshelf.plugin('pagination');
+    // bookshelf.plugin('pagination'); // 原版在count()统计上，存在性能问题
+    bookshelf.plugin(require('../../common/db/pagination'));
     bookshelf.plugin(require('../../common/db/bookshelf-CRUD').pluggable);
 
     let resourceNames = _.keys(resourceConfig);
