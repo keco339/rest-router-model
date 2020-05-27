@@ -131,6 +131,8 @@ module.exports = function parse(options) {
             }
             else if(method=='list'){
                 retData = _.assign({offset:0,limit:10},query);
+                retData.offset = Number(retData.offset);
+                retData.limit = Number(retData.limit);
                 // 挂接上级资源UUID
                 let superName = resourceConfig[resource].super;
                 if( superName && !_.isEmpty(_.trim(superName))){

@@ -160,7 +160,7 @@ module.exports = function modelBase(bookshelf, params) {
             });
             objTemp = orderBys.reduce((obj,[sort,order])=> obj.orderBy(sort,order),objTemp);
             return objTemp.fetchPage({offset,limit}).then(rows=>{
-                return {size:_.get(rows,"pagination.rowCount") || 0, items: rows.toJSON()};
+                return {offset,limit,size:_.get(rows,"pagination.rowCount") || 0, items: rows.toJSON()};
             });
         },
         // 删除
@@ -224,6 +224,8 @@ module.exports = function modelBase(bookshelf, params) {
             let relateModel = relateCollection.relatedData.target.forge({uuid:relateModelUUID});
             let that = this;
 
+            let {offset=0,limit=10} = (filter||{});
+
             let paginate =  relateModel.related(_.lowerFirst(modelInstance.tableName)).withPivot(['uuid']).query(function (qb) {
                 let {offset=0,limit=10,orderBy=`${modelInstance.hasTimestamps[0]} desc`} = (filter||{});
                 let orderBys = orderBy.split(',').map(str=>str.split(' '));
@@ -242,7 +244,7 @@ module.exports = function modelBase(bookshelf, params) {
             }).count();
             // let count = 100;
 
-            return Promise.all([paginate,count]).then(([items,count])=>({size:count,items}))
+            return Promise.all([paginate,count]).then(([items,count])=>({offset,limit,size:count,items}))
         },
         listByUpSpuers: function (upSupers, filter) {
             console.log(JSON.stringify(upSupers, null, 2));
@@ -272,7 +274,7 @@ module.exports = function modelBase(bookshelf, params) {
             });
             objTemp = orderBys.reduce((obj, [sort, order]) => obj.orderBy(sort, order), objTemp);
             return objTemp.fetchPage({offset, limit}).then(rows => {
-                return {size: _.get(rows, "pagination.rowCount") || 0, items: rows.toJSON()};
+                return {offset,limit,size: _.get(rows, "pagination.rowCount") || 0, items: rows.toJSON()};
             });
         },
         // 删除
