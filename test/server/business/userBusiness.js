@@ -19,8 +19,8 @@ class UserBusiness extends BaseBusiness{
         return schema;
         // return {name:this.name,method:'sexSta',abc:this.abc}
     }
-    fun(){
-        return {name: this.name, method: 'fun', abc: this.abc}
+    async fun(data,ctx){
+        return {name: this.name, method: 'fun', data: data}
     }
 
     st(data){
