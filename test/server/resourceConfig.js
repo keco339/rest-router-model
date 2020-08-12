@@ -15,10 +15,10 @@ module.exports = {
         rest_api: 'base',//'base',//'batch',
         super: 'directory',
         extend_api: [
-            {name:'sexSta', method:'GET', statusCode:200},
-            {name:'fun', method:'GET', statusCode:200},
-            {name: 'st', type: 'object', method: 'GET', statusCode: 200},
-            {name:'list', method:'GET',url: '/api/:version/m/:mid/users', statusCode:200},
+            // {name:'sexSta', method:'GET', statusCode:200},
+            {name:'fun', method:'GET',url: '/api/:version/userfun' ,statusCode:200},
+            // {name: 'st', type: 'object', method: 'GET', statusCode: 200},
+            // {name:'list', method:'GET',url: '/api/:version/m/:mid/users', statusCode:200},
         ],
 
         params: {
@@ -42,49 +42,49 @@ module.exports = {
             modifiedAt:{type:'time'},
         },
     },
-    'group':{
-        rest_api: 'base',
-        type: 'membershipContainer',
-        abilities: ['membershipContainer'],
-        super: 'tenant',
-        params:{
-            name:{type:'string'},
-            description:{type:'string'},
-            merchant:{type:'url'},
-            createdAt: {type:'time'},
-            modifiedAt:{type:'time'},
-        }
-    },
-    'userGroupMembership':{
-        type: 'membership',
-        rest_api: 'base',
-        memberships : ['user','group'],
-        params:{
-            user:{type:'url'},
-            group:{type:'url'},
-            createdAt: {type:'time'},
-            modifiedAt:{type:'time'},
-        }
-    },
-
-    'tree':{
-        rest_api: 'base',
-        abilities: ['tree'],
-        params:{
-            name:{type:'string'},
-            createdAt: {type:'time'},
-            modifiedAt:{type:'time'},
-        }
-    },
-    'treeGroupMembership':{
-        type: 'membership',
-        rest_api: 'base',
-        memberships : ['tree','group'],
-        params:{
-            tree:{type:'url'},
-            group:{type:'url'},
-            createdAt: {type:'time'},
-            modifiedAt:{type:'time'},
-        }
-    },
+    // 'group':{
+    //     rest_api: 'base',
+    //     type: 'membershipContainer',
+    //     abilities: ['membershipContainer'],
+    //     super: 'tenant',
+    //     params:{
+    //         name:{type:'string'},
+    //         description:{type:'string'},
+    //         merchant:{type:'url'},
+    //         createdAt: {type:'time'},
+    //         modifiedAt:{type:'time'},
+    //     }
+    // },
+    // 'userGroupMembership':{
+    //     type: 'membership',
+    //     rest_api: 'base',
+    //     memberships : ['user','group'],
+    //     params:{
+    //         user:{type:'url'},
+    //         group:{type:'url'},
+    //         createdAt: {type:'time'},
+    //         modifiedAt:{type:'time'},
+    //     }
+    // },
+    //
+    // 'tree':{
+    //     rest_api: 'base',
+    //     abilities: ['tree'],
+    //     params:{
+    //         name:{type:'string'},
+    //         createdAt: {type:'time'},
+    //         modifiedAt:{type:'time'},
+    //     }
+    // },
+    // 'treeGroupMembership':{
+    //     type: 'membership',
+    //     rest_api: 'base',
+    //     memberships : ['tree','group'],
+    //     params:{
+    //         tree:{type:'url'},
+    //         group:{type:'url'},
+    //         createdAt: {type:'time'},
+    //         modifiedAt:{type:'time'},
+    //     }
+    // },
 };

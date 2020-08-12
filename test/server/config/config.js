@@ -5,7 +5,7 @@ const fs = require('fs');
 let config = {
     //服务器配置
     server: {
-        domain : '192.168.7.5',
+        domain : '192.168.7.210',
         //domain: 'platform.icarcloud.net',
         port : 3000,
     },

@@ -43,6 +43,14 @@ restRouterModel.koaRestRouter(resourceConfig, extendBusinesses, config.knex, opt
             console.log(`[HTTP][${ctx.seq}]${str}`);
         })(ctx, next);
     });
+    koa_router.get('/api/:version/fun1', async (ctx, next) => {
+        let body = _.clone(ctx.request.body);
+        let params = ctx.params;
+        let query = _.clone(ctx.request.query);
+        ctx.body = {params,query,body};
+        ctx.status = 200;
+    });
+
 
     app.use(koa_router.routes());
 

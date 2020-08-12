@@ -6,6 +6,7 @@ let BaseBusiness = restRouterModel.BaseBusiness;
 let getSchema = restRouterModel.getSchema;
 
 const devUtils = require('develop-utils');
+const sleep = require('sleep-promise');
 
 class UserBusiness extends BaseBusiness{
     constructor(abc){
@@ -20,6 +21,7 @@ class UserBusiness extends BaseBusiness{
         // return {name:this.name,method:'sexSta',abc:this.abc}
     }
     async fun(data,ctx){
+        // await sleep(10);
         return {name: this.name, method: 'fun', data: data}
     }
 
