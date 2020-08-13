@@ -25,7 +25,12 @@ module.exports = function koa(
                     let body = {}
 
                     if (['POST', 'PUT'].indexOf(ctx.req.method) > -1) {
-                        body = parseBody === false ? ctx.request.body : await Parse(ctx)
+                        if(parseBody){
+                            body = ctx.request.body = ctx.request.body ? ctx.request.body : await Parse(ctx,{limit: '10mb'});
+                        }
+                        else {
+                            body = ctx.request.body
+                        }
                     }
 
                     let msg = Object.assign({},

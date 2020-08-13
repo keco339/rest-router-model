@@ -1,6 +1,6 @@
 {
   "name": "rest-router-model",
-  "version": "1.9.0",
+  "version": "1.9.2",
   "description": " rest-router-model",
   "repository": {
     "type": "git",
@@ -34,7 +34,8 @@
     "mysql": "^2.17.1",
     "patrun": "^4.0.0",
     "sleep-promise": "^8.0.1",
-    "uuid": "^3.2.1"
+    "uuid": "^3.2.1",
+    "xtend": "^4.0.2"
   },
   "devDependencies": {
     "chai": "^4.1.2",
