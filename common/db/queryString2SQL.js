@@ -6,6 +6,7 @@ let _ = require('lodash');
 const RangeReg = /^((\[)|(\())(\w|-| |:|@)*,(\w|-| |:|@)*((\])|(\)))$/;
 const NotReg = /^NOT\(((\w|-| |:|@)*)\)$/;
 const NotInReg = /^NOTIN\(((\w|-| |:|@|,|\[|\])*)\)$/;
+const InReg = /^IN\(((\w|-| |:|@|,|\[|\])*)\)$/;
 // const OrReg = /^OR\(((\w|-| |:|@)*)\)$/;
 // const OrReg = /^OR\(((\w|-| |:|@|\*)*)\)$/;
 const OrReg = /^OR\(((.)*)\)$/;
@@ -58,6 +59,17 @@ module.exports = function queryString2SQL(queryBuilder, qs, table = null) {
                         queryBuilder.where(TableKey, symbol, v);
                     }
                 });
+            }
+            // In查询
+            else if(InReg.test(value)){
+                let v = InReg.exec(value)[1];
+                if(_.isEmpty(v)|| v.toLowerCase()=='null'){
+                    queryBuilder.whereNull(TableKey);
+                }
+                else {
+                    let array = v.replace(/(\[)|(\])|(\")/g,"").split(',').map(str=>_.trim(str));
+                    queryBuilder.whereIn(TableKey, array);
+                }
             }
             // OR 或查询
             else if(OrReg.test(value)){
