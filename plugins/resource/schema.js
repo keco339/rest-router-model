@@ -157,6 +157,7 @@ module.exports = function schema(options) {
 
     _.keys(resourceConfig).forEach( name =>{
         console.log(`[Schema Register]--> resource: ${name} type: schema`);
+        let log = resourceConfig[name].log;
         seneca.add({resource: name, type:'schema',schema:'rest'}, (msg, done, internMeta)=>{
             let {method,cxt,data} = msg;
             let seqStr = cxt.seq?`[${cxt.seq}]`:'';
@@ -164,7 +165,7 @@ module.exports = function schema(options) {
             if(_.indexOf(SingleSchemaMethods, method) > -1){
                 schema = generateResourceSchema(name,data);
                 if(method!='get'){
-                    console.log(`[REST Schema]${seqStr} --> ${JSON.stringify(schema,null,2)}`);
+                    log && console.log(`[REST Schema]${seqStr} --> ${JSON.stringify(schema,null,2)}`);
                 }
             }
             else if(_.indexOf(ListSchemaMethods, method) > -1){

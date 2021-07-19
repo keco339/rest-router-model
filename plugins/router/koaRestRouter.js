@@ -29,6 +29,10 @@ module.exports = function restRouter(resourceConfig, extendBusinesses, dbConfig,
             resourceConfig[lName].memberships = _.concat(resourceConfig[lName].memberships||[], [mName,rName]);
             resourceConfig[rName].memberships = _.concat(resourceConfig[rName].memberships||[], [mName,lName]);
         });
+        // 缺省参数
+        _.keys(resourceConfig).map(name=>{
+            resourceConfig[name].log = _.get(resourceConfig[name],"log",true);
+        });
     }
     // 更多扩展能力插入 abilities
     {

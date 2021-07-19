@@ -14,6 +14,7 @@ module.exports = {
     'user': {
         rest_api: 'base',//'base',//'batch',
         super: 'directory',
+        log: false,
         extend_api: [
             // {name:'sexSta', method:'GET', statusCode:200},
             {name:'fun', method:'GET',url: '/api/:version/userfun' ,statusCode:200},
