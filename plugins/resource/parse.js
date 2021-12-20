@@ -21,7 +21,7 @@ function createParse(resourceConfig, resource, data, params={}) {
     _.without(restParamKeys,...hrefKeys).forEach(key => {
         if (key == 'id') { return true; }
         let {type = 'string', value = null} = restParams[key];
-        retData[key] = value || (_.toLower(type) == 'number' ? 0 : (_.toLower(type) == 'json' ? {} : null));
+        retData[key] = _.isNil(value) ? (_.toLower(type) == 'number' ? 0 : (_.toLower(type) == 'json' ? {} : null)) : value;
     });
     // 复制基础类型数据
     retData = _.assign(retData, data);
